@@ -110,11 +110,14 @@ set completeopt-=preview         " Don't show the preview window. It's annoying
 " Custom statusline setup
 set statusline=
 set statusline+=%(\ %{mode()}\ %)
-set statusline+=%.60F%(\ [%M%R%H]%)
+set statusline+=%<%.60f%(\ [%M%R%H]%)
 set statusline+=%=
 set statusline+=%y\ %{strlen(&fenc)?&fenc:&enc}
 set statusline+=%{strlen(&ff)?'['.&ff.']':''}
 set statusline+=%(\ %c\ %P\ %)
+
+set autoread
+au CursorHold * checktime
 
 " Set hidden characters
 let &listchars = "tab:\u25B8 ,trail:\uB7,eol:\uAC"
@@ -164,9 +167,9 @@ endfunction
 func! CheckNewPlugins()
     let pluginPath = expand(stdpath('config') . '/site/pack/0/start')
     if has('win32')
-        let cmd = 'DIR /B ' . pluginPath
+        let cmd = 'DIR /B "' . pluginPath . '"'
     else
-        let cmd = 'ls ' . pluginPath
+        let cmd = 'ls "' . pluginPath . '"'
     endif
     let newPlugins = systemlist(cmd)
     let curPlugins = readfile(expand('~/.nvimplugins'))
