@@ -24,16 +24,6 @@ ino <right> <esc><c-w>la
 " Shortcut to rapidly toggle 'set list'
 nmap <leader>l :set list!<CR>
 
-" Leader commands for quick snippets
-inoremap <leader>' ''<esc>i
-inoremap <leader>" ""<esc>i
-inoremap <leader>( (  )<esc>hi
-inoremap <leader>) ()<esc>i
-inoremap <leader>{ {  }<esc>hi
-inoremap <leader>} {}<esc>i
-inoremap <leader>[ [  ]<esc>hi
-inoremap <leader>] []<esc>i
-
 " Clear search highlighting
 nnoremap <leader><space> :noh<cr>
 
