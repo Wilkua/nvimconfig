@@ -96,6 +96,7 @@ set hlsearch                     " Highlight search results
 set gdefault                     " Default to using 'global' substitution
 set virtualedit=block            " Block selections are always rectangular
 set completeopt-=preview         " Don't show the preview window. It's annoying
+set path+=**                     " Include working direcotry in search path
 
 " Custom statusline setup
 set statusline=
