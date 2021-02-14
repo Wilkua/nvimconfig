@@ -155,35 +155,39 @@ endfunction
 
 """ Plugin Detection """
 
-func! CheckNewPlugins()
-    let pluginPath = expand(stdpath('config') . '/site/pack/0/start')
+func! s:CheckNewPlugins()
+    let pluginPath = expand(stdpath('data') . '/site/pack/0/start')
+    let cmd = 'ls "' . pluginPath . '"'
     if has('win32')
+        let pluginPath = expand(stdpath('config') . '/site/pack/0/start')
         let cmd = 'DIR /B "' . pluginPath . '"'
-    else
-        let cmd = 'ls "' . pluginPath . '"'
     endif
+
     let newPlugins = systemlist(cmd)
-    let curPlugins = readfile(expand('~/.nvimplugins'))
+    let pluginNoteFile = expand('~/.nvim_plugins')
+    let curPlugins = []
+    if filereadable(pluginNoteFile)
+        let curPlugins = readfile(pluginNoteFile)
+    endif
     for plugin in newPlugins
-        let plugin = substitute(plugin, "\r", "", "")
+        let plugin = substitute(plugin, '\r', '', '')
         if index(curPlugins, plugin) < 0
-            echomsg 'Adding help tags for plugin' plugin
-            silent! helptags pluginPath . '/' . plugin
-            call writefile([plugin], expand('~/.nvimplugins'), 'a')
+            let docPath = finddir('doc', pluginPath . '/' . plugin)
+            if docPath != ''
+                execute 'helptags' docPath
+                echomsg 'Added help tags for' plugin
+            endif
+
+            " We'll write the plugin to the list regardless of its doc
+            " situation
+            call writefile([plugin], pluginNoteFile, 'a')
         endif
     endfor
 endfunction
 
-call CheckNewPlugins()
+call s:CheckNewPlugins()
 
 """ Plugin Options """
-
-" CtrlP
-let g:ctrlp_map = '<leader>p'
-let g:ctrlp_custom_ignore = {
-  \ 'dir': '\v[\/](\.(git|hg|svn))|(node_modules)|(coverage)|(deps)|(_build)$',
-  \ 'file': '\v\.(exe|so|dll|swp)',
-  \ }
 
 " GitGutter
 let g:gitgutter_map_keys = 0          " Disable GitGutter shortcut keys
@@ -193,11 +197,6 @@ let g:NERDSpaceDelims = 1             " Add space ofter comment char
 let g:NERDDefaultAlign = 'left'       " Left align comment marks
 let g:NERDCommentEmptyLines = 1       " Comment blank lines
 let g:NERDTrimTrailingWhitespace = 1  " Trim whitespace on uncomment
-
-" YankRing
-" Don't limit the amount of data stored in each yankring entry
-let g:yankring_max_element_length = 0
-let g:yankring_persist = 0  " Don't persist YankRing data
 
 " JSON Syntax
 let g:vim_json_syntax_conceal = 0  " Don't hide quotes in JSON files

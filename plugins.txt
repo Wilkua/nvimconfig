@@ -1,0 +1,13 @@
+Here is a list of the plugins I currently enjoy using
+
+* delimitMate
+* jellybeans.vim
+* nerdcommenter
+* targets.vim
+* vim-dispatch
+* vim-fugitive
+* vim-repeat
+* vim-surround
+* vim-unimpaired
+* vim-yankstack
+
