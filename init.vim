@@ -159,7 +159,6 @@ func! s:CheckNewPlugins()
     let pluginPath = expand(stdpath('data') . '/site/pack/0/start')
     let cmd = 'ls "' . pluginPath . '"'
     if has('win32')
-        let pluginPath = expand(stdpath('config') . '/site/pack/0/start')
         let cmd = 'DIR /B "' . pluginPath . '"'
     endif
 
