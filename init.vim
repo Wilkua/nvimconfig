@@ -95,7 +95,7 @@ set incsearch                    " Do incremental searching
 set hlsearch                     " Highlight search results
 set gdefault                     " Default to using 'global' substitution
 set virtualedit=block            " Block selections are always rectangular
-set completeopt-=preview         " Don't show the preview window. It's annoying
+set completeopt=menuone,noselect " always show menu; don't auto select; no preview
 set path+=**                     " Include working direcotry in search path
 
 " Custom statusline setup
@@ -107,6 +107,19 @@ set statusline+=%y\ %{strlen(&fenc)?&fenc:&enc}
 set statusline+=%{strlen(&ff)?'['.&ff.']':''}
 set statusline+=%(\ %c\ %P\ %)
 
+if (has("nvim"))
+    "For Neovim 0.1.3 and 0.1.4 < https://github.com/neovim/neovim/pull/2198 >
+    let $NVIM_TUI_ENABLE_TRUE_COLOR=1
+endif
+
+"For Neovim > 0.1.5 and Vim > patch 7.4.1799 < https://github.com/vim/vim/commit/61be73bb0f965a895bfb064ea3e55476ac175162 >
+"Based on Vim patch 7.4.1770 (`guicolors` option) < https://github.com/vim/vim/commit/8a633e3427b47286869aa4b96f2bfc1fe65b25cd >
+" < https://github.com/neovim/neovim/wiki/Following-HEAD#20160511 >
+if (has("termguicolors"))
+    set termguicolors
+endif
+
+" enable autoread and check the file whenever the curso is idle
 set autoread
 au CursorHold * checktime
 
@@ -114,9 +127,9 @@ au CursorHold * checktime
 let &listchars = "tab:\u25B8 ,trail:\uB7,eol:\uAC"
 
 """ Syntax Highlighting """
-
 syntax on
-colorscheme darkvis
+set background=dark
+colorscheme nightfox
 
 " Convenient command to see the difference between the current buffer and the
 " file it was loaded from, thus the changes you made.
@@ -203,5 +216,73 @@ let g:vim_json_syntax_conceal = 0  " Don't hide quotes in JSON files
 " EditorConfig
 let g:EditorConfig_exclude_patterns = ['fugitive://.*', 'scp://.*']
 
-" Emmet
-let g:user_emmet_leader_key = '<leader>'
+" Lua cconfigurations
+lua <<EOF
+
+-- Gitsigns
+require('gitsigns').setup()
+
+-- nvim-cmp
+local cmp = require('cmp')
+
+cmp.setup({
+    snippet = {
+        expand = function(args)
+            require('luasnip').lsp_expand(args.body)
+        end,
+    },
+    window = {
+        -- completion = cmp.config.window.bordered(),
+        documentation = cmp.config.window.bordered(),
+    },
+    mapping = cmp.mapping.preset.insert({
+        ['<C-p>'] = cmp.mapping.scroll_docs(-4),
+        ['<C-n>'] = cmp.mapping.scroll_docs(4),
+        ['<C-Space>'] = cmp.mapping.complete(),
+        ['<C-e>'] = cmp.mapping.abort(),
+        ['<CR>'] = cmp.mapping.confirm({ select = true }), -- Accept currently selected item. Set `select` to `false` to only confirm explicitly selected items.
+    }),
+    sources = cmp.config.sources({
+        { name = 'nvim_lsp' },
+        { name = 'luasnip' },
+    }, {
+        { name = 'buffer' },
+    })
+})
+
+-- CMP file types
+cmp.setup.filetype('gitcommit', {
+    sources = cmp.config.sources({
+        { name = 'cmp_git' }, -- You can specify the `cmp_git` source if you were installed it.
+    }, {
+        { name = 'buffer' },
+    })
+})
+
+-- Use buffer source for `/` (if you enabled `native_menu`, this won't work anymore).
+cmp.setup.cmdline('/', {
+    mapping = cmp.mapping.preset.cmdline(),
+    sources = {
+        { name = 'buffer' }
+    }
+})
+
+-- Use cmdline & path source for ':' (if you enabled `native_menu`, this won't work anymore).
+cmp.setup.cmdline(':', {
+    mapping = cmp.mapping.preset.cmdline(),
+    sources = cmp.config.sources({
+        { name = 'path' }
+    }, {
+        { name = 'cmdline' }
+    })
+})
+
+-- Set up lspconfig.
+local capabilities = require('cmp_nvim_lsp').update_capabilities(vim.lsp.protocol.make_client_capabilities())
+-- Replace <YOUR_LSP_SERVER> with each lsp server you've enabled.
+local lsp = require('lspconfig')
+lsp.rust_analyzer.setup({
+    capabilities = capabilities,
+})
+EOF
+
