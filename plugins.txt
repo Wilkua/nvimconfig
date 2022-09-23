@@ -1,13 +1,27 @@
 Here is a list of the plugins I currently enjoy using
 
+* LuaSnip
+* cmp-buffer
+* cmp-cmdline
+* cmp-nvim-lsp
+* cmp-path
+* cmp_luasnip
 * delimitMate
+* editorconfig-vim
+* gitsigns.nvim
 * jellybeans.vim
-* nerdcommenter
+* nightfox.nvim
+* nvim-cmp
+* nvim-lspconfig
 * targets.vim
+* vim-commentary
 * vim-dispatch
 * vim-fugitive
+* vim-gutentags
+* vim-haml
+* vim-jdaddy
 * vim-repeat
 * vim-surround
 * vim-unimpaired
-* vim-yankstack
-
+* yajs.vim
+* yats.vim
