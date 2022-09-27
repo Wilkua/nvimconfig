@@ -240,8 +240,14 @@ end
 
 -- nvim-cmp
 local cmp_ok, cmp = pcall(require, 'cmp')
+local luasnip_ok, luasnip = pcall(require, 'luasnip')
 
-if cmp_ok then
+if cmp_ok and luasnip_ok then
+    local function has_words_before()
+        local line, col = unpack(vim.api.nvim_win_get_cursor(0))
+        return col ~= 0 and vim.api.nvim_buf_get_lines(0, line - 1, line, true)[1]:sub(col, col):match "%s" == nil
+    end
+
     cmp.setup {
         snippet = {
             expand = function(args)
