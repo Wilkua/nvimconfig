@@ -225,6 +225,8 @@ let g:EditorConfig_exclude_patterns = ['fugitive://.*', 'scp://.*']
 
 " Lua cconfigurations
 lua <<EOF
+-- Make LUA loading faster
+local _, _ = pcall(require, 'impatient')
 
 -- Define global notify
 local notify_ok, notify = pcall(require, 'notify')
