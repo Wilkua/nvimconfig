@@ -428,7 +428,7 @@ if telescope_ok then
     end
 end
 
-local autopairs_ok, autopairs = pcall(require, 'autopairs')
+local autopairs_ok, autopairs = pcall(require, 'nvim-autopairs')
 if autopairs_ok then
     autopairs.setup {}
 end
