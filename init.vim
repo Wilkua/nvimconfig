@@ -68,7 +68,7 @@ nnoremap <leader>ff <cmd>Telescope find_files<cr>
 nnoremap <leader>fg <cmd>Telescope live_grep<cr>
 nnoremap <leader>fb <cmd>Telescope buffers<cr>
 nnoremap <leader>fh <cmd>Telescope help_tags<cr>
-
+nnoremap <leader>fa <cmd>Telescope aerial<cr>
 
 """ Settings """
 
@@ -361,6 +361,7 @@ if null_ls_ok then
     }
 end
 
+-- Treesitter configuration
 local treesitter_ok, treesitter = pcall(require, 'nvim-treesitter.config')
 if treesitter_ok then
     treesitter.setup {
@@ -376,6 +377,60 @@ if treesitter_ok then
     }
 end
 
+-- Comment configuration
+local comment_ok, comment = pcall(require, 'Comment')
+if comment_ok then
+    comment.setup();
+end
 
+-- Aerial configuration
+local aerial_ok, aerial = pcall(require, 'aerial')
+if aerial_ok then
+    aerial.setup {}
+end
+
+-- Telescope configuration
+local telescope_ok, telescope = pcall(require, 'telescope')
+if telescope_ok then
+    telescope.setup {
+        defaults = {
+            selection_caret = '-> ',
+            path_display = { 'truncate' },
+            selection_strategy = 'reset',
+            sorting_strategy = 'descending',
+            layout_strategy = 'horizontal',
+        },
+        extensions = {
+            fzy_native = {
+                override_generic_sorter = true,
+                override_file_sorter = true,
+            },
+            fzf = {
+                fuzzy = true,
+                override_generic_sorter = true,
+                override_file_sorter = true,
+                case_mode = 'smart_case',
+            }
+        }
+    }
+
+    if aerial_ok then
+        telescope.load_extension 'aerial'
+    end
+
+    -- There's no good way to detect if this plugin is available,
+    -- so just make sure it's installed. Alternatively, just disable
+    -- this part alltogether.
+    if vim.fn.has 'win32' == 1 then
+        telescope.load_extension 'fzy_native'
+    else
+        telescope.load_extension 'fzf'
+    end
+end
+
+local autopairs_ok, autopairs = pcall(require, 'autopairs')
+if autopairs_ok then
+    autopairs.setup {}
+end
 EOF
 
