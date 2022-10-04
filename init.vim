@@ -432,5 +432,11 @@ local autopairs_ok, autopairs = pcall(require, 'nvim-autopairs')
 if autopairs_ok then
     autopairs.setup {}
 end
+
+-- Feline
+local feline_ok, feline = pcall(require, 'feline')
+if feline_ok then
+    feline.setup()
+end
 EOF
 
