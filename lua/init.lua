@@ -29,10 +29,10 @@ noremap('i', '<left>', '<esc><c-w>ha')
 noremap('i', '<right>', '<esc><c-w>la')
 
 -- Shortcut to rapidly toggle 'set list'
-noremap('n', '<leader>l', ':set list!<CR>')
+noremap('n', '<leader>l', ':set list!<CR>', { silent = true })
 
 -- Clear search highlighting
-noremap('n', '<leader><space>', ':noh<cr>')
+noremap('n', '<leader><space>', ':noh<cr>', { silent = true })
 
 -- Quick upper- and lowercase word conversion
 noremap('n', '<leader>U', 'gUiw')
@@ -43,7 +43,7 @@ vim.keymap.set('n', 'Q', 'gq')
 
 -- CTRL-U in insert mode deletes a lot.  Use CTRL-G u to first break undo,
 -- so that you can undo CTRL-U after inserting a line break.
-noremap('n', '<c-u>', '<c-g>u<c-U>')
+noremap('i', '<c-u>', '<c-g>u<c-U>')
 
 -- Center the line moved to with G
 noremap('n', 'G', 'Gzz')
@@ -282,13 +282,40 @@ end
 local cmp_nvim_lsp_ok, cmp_nvim_lsp = pcall(require, 'cmp_nvim_lsp')
 local lsp_ok, lsp = pcall(require, 'lspconfig')
 if cmp_nvim_lsp_ok and lsp_ok then
-    local capabilities = require('cmp_nvim_lsp').update_capabilities(vim.lsp.protocol.make_client_capabilities())
-    local lsp = require('lspconfig')
+    -- Setup lsp funcitonality
+    local mapopts = { silent = true }
+    noremap('n', '<leader>e', vim.diagnostic.open_float, mapopts)
+    noremap('n', '[d', vim.diagnostic.goto_prev, mapopts)
+    noremap('n', ']d', vim.diagnostic.goto_next, mapopts)
+    noremap('n', '<leader>q', vim.diagnostic.setloclist, mapopts)
+
+    local on_attach = function (client, bufnr)
+        local bufopts = { silent = true, buffer = bufnr }
+        noremap('n', 'gD', vim.lsp.buf.declaration, bufopts)
+        noremap('n', 'gd', vim.lsp.buf.definition, bufopts)
+        noremap('n', 'K', vim.lsp.buf.hover, bufopts)
+        noremap('n', 'gi', vim.lsp.buf.implementation, bufopts)
+        noremap('n', '<C-k>', vim.lsp.buf.signature_help, bufopts)
+        noremap('n', '<leader>wa', vim.lsp.buf.add_workspace_folder, bufopts)
+        noremap('n', '<leader>wr', vim.lsp.buf.remove_workspace_folder, bufopts)
+        noremap('n', '<leader>wl', function()
+            print(vim.inspect(vim.lsp.buf.list_workspace_folders()))
+        end, bufopts)
+        noremap('n', '<leader>D', vim.lsp.buf.type_definition, bufopts)
+        noremap('n', '<leader>rn', vim.lsp.buf.rename, bufopts)
+        noremap('n', '<leader>ca', vim.lsp.buf.code_action, bufopts)
+        noremap('n', 'gr', vim.lsp.buf.references, bufopts)
+        noremap('n', '<leader>fm', function() vim.lsp.buf.format { async = true } end, bufopts)
+    end
+
+    local capabilities = cmp_nvim_lsp.update_capabilities(vim.lsp.protocol.make_client_capabilities())
     lsp.rust_analyzer.setup {
         capabilities = capabilities,
+        on_attach = on_attach,
     }
     lsp.tsserver.setup {
         capabilities = capabilities,
+        on_attach = on_attach,
     }
 end
 
@@ -345,8 +372,9 @@ if telescope_ok then
 
     telescope.setup {
         defaults = {
-            selection_caret = '-> ',
+            selection_caret = '->',
             path_display = { 'truncate' },
+            file_ignore_patterns = {'node_modules'},
             selection_strategy = 'reset',
             sorting_strategy = 'descending',
             layout_strategy = 'horizontal',
