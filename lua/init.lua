@@ -60,6 +60,7 @@ noremap('n', '<c-y>', '5<c-y>')
 local set = vim.opt
 
 set.encoding = 'utf-8'               -- Set the encoding to UTF-8
+set.fileformat = 'unix'              -- Always use Unix line endings
 set.laststatus = 2                   -- Set the status line to have 2 rows
 set.scrolloff = 3                    -- Always keep three lines below the cursor when scrolling
 set.showmode = false                 -- Hide the mode from the default status bar
