@@ -424,3 +424,9 @@ if toggleterm_ok then
     toggleterm.setup {}
 end
 
+-- leap
+local leap_ok, leap = pcall(require, 'leap')
+if leap_ok then
+    leap.add_default_mappings()
+end
+
