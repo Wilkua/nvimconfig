@@ -29,17 +29,17 @@ noremap('i', '<left>', '<esc><c-w>ha')
 noremap('i', '<right>', '<esc><c-w>la')
 
 -- Shortcut to rapidly toggle 'set list'
-noremap('n', '<leader>l', ':set list!<CR>', { silent = true })
+noremap('n', '<leader>l', ':set list!<CR>', { desc = 'Toggle unprintable chars', silent = true })
 
 -- Clear search highlighting
-noremap('n', '<leader><space>', ':noh<cr>', { silent = true })
+noremap('n', '<esc>', ':noh<cr>', { desc = 'Clear search hilight', silent = true })
 
 -- Quick upper- and lowercase word conversion
-noremap('n', '<leader>U', 'gUiw')
-noremap('n', '<leader>u', 'guiw')
+noremap('n', '<leader>U', 'gUiw', { desc = 'Uppercase whole word' })
+noremap('n', '<leader>u', 'guiw', { desc = 'Lowercase whole word' })
 
 -- Don't use Ex mode, use Q for formatting
-vim.keymap.set('n', 'Q', 'gq')
+vim.keymap.set('n', 'Q', 'gq', { desc = 'Format with motion' })
 
 -- CTRL-U in insert mode deletes a lot.  Use CTRL-G u to first break undo,
 -- so that you can undo CTRL-U after inserting a line break.
@@ -284,29 +284,27 @@ local cmp_nvim_lsp_ok, cmp_nvim_lsp = pcall(require, 'cmp_nvim_lsp')
 local lsp_ok, lsp = pcall(require, 'lspconfig')
 if cmp_nvim_lsp_ok and lsp_ok then
     -- Setup lsp funcitonality
-    local mapopts = { silent = true }
-    noremap('n', '<leader>e', vim.diagnostic.open_float, mapopts)
-    noremap('n', '[d', vim.diagnostic.goto_prev, mapopts)
-    noremap('n', ']d', vim.diagnostic.goto_next, mapopts)
-    noremap('n', '<leader>q', vim.diagnostic.setloclist, mapopts)
+    noremap('n', '<leader>e', vim.diagnostic.open_float, { desc = 'Open diagnostics', silent = true })
+    noremap('n', '[d', vim.diagnostic.goto_prev, { desc = 'Prev diagnostic', silent = true })
+    noremap('n', ']d', vim.diagnostic.goto_next, { desc = 'Next diagnostic', silent = true })
+    noremap('n', '<leader>q', vim.diagnostic.setloclist, { desc = 'Set loclist', silent = true })
 
     local on_attach = function (client, bufnr)
-        local bufopts = { silent = true, buffer = bufnr }
-        noremap('n', 'gD', vim.lsp.buf.declaration, bufopts)
-        noremap('n', 'gd', vim.lsp.buf.definition, bufopts)
-        noremap('n', 'K', vim.lsp.buf.hover, bufopts)
-        noremap('n', 'gi', vim.lsp.buf.implementation, bufopts)
-        noremap('n', '<C-k>', vim.lsp.buf.signature_help, bufopts)
-        noremap('n', '<leader>wa', vim.lsp.buf.add_workspace_folder, bufopts)
-        noremap('n', '<leader>wr', vim.lsp.buf.remove_workspace_folder, bufopts)
+        noremap('n', 'gD', vim.lsp.buf.declaration, { desc = 'Go to declaration', silent = true, buffer = bufnr })
+        noremap('n', 'gd', vim.lsp.buf.definition, { desc = 'Go to definition', silent = true, buffer = bufnr })
+        noremap('n', 'K', vim.lsp.buf.hover, { desc = 'Hover info', silent = true, buffer = bufnr })
+        noremap('n', 'gi', vim.lsp.buf.implementation, { desc = 'List implementations', silent = true, buffer = bufnr })
+        noremap({'n', 'i'}, '<C-k>', vim.lsp.buf.signature_help, { desc = 'Signature help', silent = true, buffer = bufnr })
+        noremap('n', '<leader>wa', vim.lsp.buf.add_workspace_folder, { desc = 'Add workspace folder', silent = true, buffer = bufnr })
+        noremap('n', '<leader>wr', vim.lsp.buf.remove_workspace_folder, { desc = 'Remove workspace folder', silent = true, buffer = bufnr })
         noremap('n', '<leader>wl', function()
             print(vim.inspect(vim.lsp.buf.list_workspace_folders()))
-        end, bufopts)
-        noremap('n', '<leader>D', vim.lsp.buf.type_definition, bufopts)
-        noremap('n', '<leader>rn', vim.lsp.buf.rename, bufopts)
-        noremap('n', '<leader>ca', vim.lsp.buf.code_action, bufopts)
-        noremap('n', 'gr', vim.lsp.buf.references, bufopts)
-        noremap('n', '<leader>fm', function() vim.lsp.buf.format { async = true } end, bufopts)
+        end, { desc = 'List workspace folders', silent = true, buffer = bufnr })
+        noremap('n', '<leader>D', vim.lsp.buf.type_definition, { desc = 'Show type definition', silent = true, buffer = bufnr })
+        noremap('n', '<leader>rn', vim.lsp.buf.rename, { desc = 'Rename symbol', silent = true, buffer = bufnr })
+        noremap('n', '<leader>ca', vim.lsp.buf.code_action, { desc = 'Select code action', silent = true, buffer = bufnr })
+        noremap('n', 'gr', vim.lsp.buf.references, { desc = 'List references', silent = true, buffer = bufnr })
+        noremap('n', '<leader>fm', function() vim.lsp.buf.format { async = true } end, { desc = 'Format buffer', silent = true, buffer = bufnr })
     end
 
     local capabilities = cmp_nvim_lsp.update_capabilities(vim.lsp.protocol.make_client_capabilities())
@@ -366,10 +364,10 @@ if telescope_ok then
     local builtin = require'telescope.builtin'
 
     -- Key mapping
-    noremap('n', '<leader>ff', builtin.find_files)
-    noremap('n', '<leader>fg', builtin.live_grep)
-    noremap('n', '<leader>fb', builtin.buffers)
-    noremap('n', '<leader>fh', builtin.help_tags)
+    noremap('n', '<leader>ff', builtin.find_files, { desc = 'Find file ...' })
+    noremap('n', '<leader>fg', builtin.live_grep, { desc = 'Live grep ...' })
+    noremap('n', '<leader>fb', builtin.buffers, { desc = 'Find buffer ...' })
+    noremap('n', '<leader>fh', builtin.help_tags, { desc = 'Find help tag ...' })
 
     telescope.setup {
         defaults = {
@@ -428,5 +426,11 @@ end
 local leap_ok, leap = pcall(require, 'leap')
 if leap_ok then
     leap.add_default_mappings()
+end
+
+-- which-key (probably should be last)
+local wk_ok, which_key = pcall(require, 'which-key')
+if wk_ok then
+    which_key.setup {}
 end
 
