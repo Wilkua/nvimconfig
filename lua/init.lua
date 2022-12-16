@@ -170,267 +170,228 @@ vim.g.vim_json_syntax_conceal = 0  -- Don't hide quotes in JSON files
 vim.g.EditorConfig_exclude_patterns = {'fugitive://.*', 'scp://.*'}
 
 -- Make LUA loading faster
-local _, _ = pcall(require, 'impatient')
+require('impatient')
 
--- Define global notify
-local notify_ok, notify = pcall(require, 'notify')
-if notify_ok then
-    vim.notify = notify
-end
+-- Mason and LSP bridge
+require('mason').setup()
+require('mason-lspconfig').setup()
 
--- Gitsigns
-local gitsigns_ok, gitsigns = pcall(require, 'gitsigns')
-if gitsigns_ok then
-    gitsigns.setup()
-end
+-- Replace vim notify with better one
+vim.notify = require('notify')
 
 -- nvim-cmp
-local cmp_ok, cmp = pcall(require, 'cmp')
-local luasnip_ok, luasnip = pcall(require, 'luasnip')
+local cmp = require('cmp')
+local luasnip = require('luasnip')
 
-if cmp_ok and luasnip_ok then
-    local function has_words_before()
-        local line, col = unpack(vim.api.nvim_win_get_cursor(0))
-        return col ~= 0 and vim.api.nvim_buf_get_lines(0, line - 1, line, true)[1]:sub(col, col):match "%s" == nil
-    end
-
-    cmp.setup {
-        snippet = {
-            expand = function(args)
-                require('luasnip').lsp_expand(args.body)
-            end,
-        },
-        window = {
-            -- completion = cmp.config.window.bordered(),
-            documentation = cmp.config.window.bordered(),
-        },
-        mapping = cmp.mapping.preset.insert({
-            ["<Up>"] = cmp.mapping.select_prev_item(),
-            ["<Down>"] = cmp.mapping.select_next_item(),
-            ["<C-p>"] = cmp.mapping.select_prev_item(),
-            ["<C-n>"] = cmp.mapping.select_next_item(),
-            ["<C-k>"] = cmp.mapping.select_prev_item(),
-            ["<C-j>"] = cmp.mapping.select_next_item(),
-            ["<C-d>"] = cmp.mapping(cmp.mapping.scroll_docs(-1), { "i", "c" }),
-            ["<C-f>"] = cmp.mapping(cmp.mapping.scroll_docs(1), { "i", "c" }),
-            ["<C-Space>"] = cmp.mapping(cmp.mapping.complete(), { "i", "c" }),
-            ["<C-y>"] = cmp.config.disable,
-            ["<C-e>"] = cmp.mapping {
-              i = cmp.mapping.abort(),
-              c = cmp.mapping.close(),
-            },
-            ["<CR>"] = cmp.mapping.confirm { select = false },
-            ["<Tab>"] = cmp.mapping(function(fallback)
-                if cmp.visible() then
-                    cmp.select_next_item()
-                elseif luasnip.expandable() then
-                    luasnip.expand()
-                elseif luasnip.expand_or_jumpable() then
-                    luasnip.expand_or_jump()
-                elseif has_words_before() then
-                    cmp.complete()
-                else
-                    fallback()
-                end
-            end, { "i",  "s" }),
-            ["<S-Tab>"] = cmp.mapping(function(fallback)
-                if cmp.visible() then
-                    cmp.select_prev_item()
-                elseif luasnip.jumpable(-1) then
-                    luasnip.jump(-1)
-                else
-                    fallback()
-                end
-            end, { "i", "s" }),
-        }),
-        sources = cmp.config.sources({
-            { name = 'nvim_lsp' },
-            { name = 'luasnip' },
-        }, {
-            { name = 'buffer' },
-        })
-    }
-
-    -- CMP file types
-    cmp.setup.filetype('gitcommit', {
-        sources = cmp.config.sources({
-            { name = 'cmp_git' }, -- You can specify the `cmp_git` source if you were installed it.
-        }, {
-            { name = 'buffer' },
-        })
-    })
-
-    -- Use buffer source for `/` (if you enabled `native_menu`, this won't work anymore).
-    cmp.setup.cmdline('/', {
-        mapping = cmp.mapping.preset.cmdline(),
-        sources = {
-            { name = 'buffer' }
-        }
-    })
-
-    -- Use cmdline & path source for ':' (if you enabled `native_menu`, this won't work anymore).
-    cmp.setup.cmdline(':', {
-        mapping = cmp.mapping.preset.cmdline(),
-        sources = cmp.config.sources({
-            { name = 'path' }
-        }, {
-            { name = 'cmdline' }
-        })
-    })
+local function has_words_before()
+    local line, col = unpack(vim.api.nvim_win_get_cursor(0))
+    return col ~= 0 and vim.api.nvim_buf_get_lines(0, line - 1, line, true)[1]:sub(col, col):match "%s" == nil
 end
+
+cmp.setup {
+    snippet = {
+        expand = function(args)
+            luasnip.lsp_expand(args.body)
+        end,
+    },
+    window = {
+        completion = cmp.config.window.bordered(),
+        documentation = cmp.config.window.bordered(),
+    },
+    mapping = cmp.mapping.preset.insert({
+        ["<Up>"] = cmp.mapping.select_prev_item(),
+        ["<Down>"] = cmp.mapping.select_next_item(),
+        ["<C-p>"] = cmp.mapping.select_prev_item(),
+        ["<C-n>"] = cmp.mapping.select_next_item(),
+        ["<C-k>"] = cmp.mapping.select_prev_item(),
+        ["<C-j>"] = cmp.mapping.select_next_item(),
+        ["<C-d>"] = cmp.mapping(cmp.mapping.scroll_docs(-1), { "i", "c" }),
+        ["<C-f>"] = cmp.mapping(cmp.mapping.scroll_docs(1), { "i", "c" }),
+        ["<C-Space>"] = cmp.mapping(cmp.mapping.complete(), { "i", "c" }),
+        ["<C-y>"] = cmp.config.disable,
+        ["<C-e>"] = cmp.mapping {
+          i = cmp.mapping.abort(),
+          c = cmp.mapping.close(),
+        },
+        ["<CR>"] = cmp.mapping.confirm { select = false },
+        ["<Tab>"] = cmp.mapping(function(fallback)
+            if cmp.visible() then
+                cmp.select_next_item()
+            elseif luasnip.expandable() then
+                luasnip.expand()
+            elseif luasnip.expand_or_jumpable() then
+                luasnip.expand_or_jump()
+            elseif has_words_before() then
+                cmp.complete()
+            else
+                fallback()
+            end
+        end, { "i",  "s" }),
+        ["<S-Tab>"] = cmp.mapping(function(fallback)
+            if cmp.visible() then
+                cmp.select_prev_item()
+            elseif luasnip.jumpable(-1) then
+                luasnip.jump(-1)
+            else
+                fallback()
+            end
+        end, { "i", "s" }),
+    }),
+    sources = cmp.config.sources({
+        { name = 'nvim_lsp' },
+        { name = 'luasnip' },
+    }, {
+        { name = 'buffer' },
+    })
+}
+
+-- CMP file types
+cmp.setup.filetype('gitcommit', {
+    sources = cmp.config.sources({
+        { name = 'cmp_git' }, -- You can specify the `cmp_git` source if you were installed it.
+    }, {
+        { name = 'buffer' },
+    })
+})
+
+-- Use buffer source for `/` (if you enabled `native_menu`, this won't work anymore).
+cmp.setup.cmdline('/', {
+    mapping = cmp.mapping.preset.cmdline(),
+    sources = {
+        { name = 'buffer' }
+    }
+})
+
+-- Use cmdline & path source for ':' (if you enabled `native_menu`, this won't work anymore).
+cmp.setup.cmdline(':', {
+    mapping = cmp.mapping.preset.cmdline(),
+    sources = cmp.config.sources({
+        { name = 'path' }
+    }, {
+        { name = 'cmdline' }
+    })
+})
 
 -- Set up lspconfig.
-local cmp_nvim_lsp_ok, cmp_nvim_lsp = pcall(require, 'cmp_nvim_lsp')
-local lsp_ok, lsp = pcall(require, 'lspconfig')
-if cmp_nvim_lsp_ok and lsp_ok then
-    -- Setup lsp funcitonality
-    noremap('n', '<leader>e', vim.diagnostic.open_float, { desc = 'Open diagnostics', silent = true })
-    noremap('n', '[d', vim.diagnostic.goto_prev, { desc = 'Prev diagnostic', silent = true })
-    noremap('n', ']d', vim.diagnostic.goto_next, { desc = 'Next diagnostic', silent = true })
-    noremap('n', '<leader>q', vim.diagnostic.setloclist, { desc = 'Set loclist', silent = true })
 
-    local on_attach = function (client, bufnr)
-        noremap('n', 'gD', vim.lsp.buf.declaration, { desc = 'Go to declaration', silent = true, buffer = bufnr })
-        noremap('n', 'gd', vim.lsp.buf.definition, { desc = 'Go to definition', silent = true, buffer = bufnr })
-        noremap('n', 'K', vim.lsp.buf.hover, { desc = 'Hover info', silent = true, buffer = bufnr })
-        noremap('n', 'gi', vim.lsp.buf.implementation, { desc = 'List implementations', silent = true, buffer = bufnr })
-        noremap({'n', 'i'}, '<C-k>', vim.lsp.buf.signature_help, { desc = 'Signature help', silent = true, buffer = bufnr })
-        noremap('n', '<leader>wa', vim.lsp.buf.add_workspace_folder, { desc = 'Add workspace folder', silent = true, buffer = bufnr })
-        noremap('n', '<leader>wr', vim.lsp.buf.remove_workspace_folder, { desc = 'Remove workspace folder', silent = true, buffer = bufnr })
-        noremap('n', '<leader>wl', function()
-            print(vim.inspect(vim.lsp.buf.list_workspace_folders()))
-        end, { desc = 'List workspace folders', silent = true, buffer = bufnr })
-        noremap('n', '<leader>D', vim.lsp.buf.type_definition, { desc = 'Show type definition', silent = true, buffer = bufnr })
-        noremap('n', '<leader>rn', vim.lsp.buf.rename, { desc = 'Rename symbol', silent = true, buffer = bufnr })
-        noremap('n', '<leader>ca', vim.lsp.buf.code_action, { desc = 'Select code action', silent = true, buffer = bufnr })
-        noremap('n', 'gr', vim.lsp.buf.references, { desc = 'List references', silent = true, buffer = bufnr })
-        noremap('n', '<leader>fm', function() vim.lsp.buf.format { async = true } end, { desc = 'Format buffer', silent = true, buffer = bufnr })
-    end
+-- Setup lsp funcitonality
+noremap('n', '<leader>e', vim.diagnostic.open_float, { desc = 'Open diagnostics', silent = true })
+noremap('n', '[d', vim.diagnostic.goto_prev, { desc = 'Prev diagnostic', silent = true })
+noremap('n', ']d', vim.diagnostic.goto_next, { desc = 'Next diagnostic', silent = true })
+noremap('n', '<leader>q', vim.diagnostic.setloclist, { desc = 'Set loclist', silent = true })
 
-    local capabilities = cmp_nvim_lsp.update_capabilities(vim.lsp.protocol.make_client_capabilities())
-    lsp.rust_analyzer.setup {
-        capabilities = capabilities,
-        on_attach = on_attach,
-    }
-    lsp.tsserver.setup {
-        capabilities = capabilities,
-        on_attach = on_attach,
-    }
+local on_attach = function (client, bufnr)
+    noremap('n', 'gD', vim.lsp.buf.declaration, { desc = 'Go to declaration', silent = true, buffer = bufnr })
+    noremap('n', 'gd', vim.lsp.buf.definition, { desc = 'Go to definition', silent = true, buffer = bufnr })
+    noremap('n', 'K', vim.lsp.buf.hover, { desc = 'Hover info', silent = true, buffer = bufnr })
+    noremap('n', 'gi', vim.lsp.buf.implementation, { desc = 'List implementations', silent = true, buffer = bufnr })
+    noremap({'n', 'i'}, '<C-k>', vim.lsp.buf.signature_help, { desc = 'Signature help', silent = true, buffer = bufnr })
+    noremap('n', '<leader>wa', vim.lsp.buf.add_workspace_folder, { desc = 'Add workspace folder', silent = true, buffer = bufnr })
+    noremap('n', '<leader>wr', vim.lsp.buf.remove_workspace_folder, { desc = 'Remove workspace folder', silent = true, buffer = bufnr })
+    noremap('n', '<leader>wl', function()
+        print(vim.inspect(vim.lsp.buf.list_workspace_folders()))
+    end, { desc = 'List workspace folders', silent = true, buffer = bufnr })
+    noremap('n', '<leader>D', vim.lsp.buf.type_definition, { desc = 'Show type definition', silent = true, buffer = bufnr })
+    noremap('n', '<leader>rn', vim.lsp.buf.rename, { desc = 'Rename symbol', silent = true, buffer = bufnr })
+    noremap('n', '<leader>ca', vim.lsp.buf.code_action, { desc = 'Select code action', silent = true, buffer = bufnr })
+    noremap('n', 'gr', vim.lsp.buf.references, { desc = 'List references', silent = true, buffer = bufnr })
+    noremap('n', '<leader>fm', function() vim.lsp.buf.format { async = true } end, { desc = 'Format buffer', silent = true, buffer = bufnr })
 end
+
+local cmp_nvim_lsp = require('cmp_nvim_lsp')
+local lsp = require('lspconfig')
+local capabilities = cmp_nvim_lsp.update_capabilities(vim.lsp.protocol.make_client_capabilities())
+lsp.rust_analyzer.setup {
+    capabilities = capabilities,
+    on_attach = on_attach,
+}
+lsp.tsserver.setup {
+    capabilities = capabilities,
+    on_attach = on_attach,
+}
 
 -- null-ls cconfigurations
-local null_ls_ok, null_ls = pcall(require, 'null-ls')
-if null_ls_ok then
-    null_ls.setup {
-        sources = {
-            null_ls.builtins.diagnostics.eslint_d,
-            null_ls.builtins.diagnostics.php,
-            null_ls.builtins.formatting.rustfmt,
-        },
-    }
-end
+local null_ls = require('null-ls')
+null_ls.setup {
+    sources = {
+        null_ls.builtins.diagnostics.eslint_d,
+        null_ls.builtins.diagnostics.php,
+        null_ls.builtins.formatting.rustfmt,
+    },
+}
 
 -- Treesitter configuration
-local treesitter_ok, treesitter = pcall(require, 'nvim-treesitter.config')
-if treesitter_ok then
-    treesitter.setup {
-        ensure_installed = {},
-        sync_install = false,
-        ignore_install = {},
-        highlight = {
-            enable = true,
-            additional_vim_regex_highlighting  = false,
-        },
-        indent = { enable = false },
-        context_commentstring = { enable = true },
-    }
-end
-
--- Comment configuration
-local comment_ok, comment = pcall(require, 'Comment')
-if comment_ok then
-    comment.setup();
-end
-
--- Aerial configuration
-local aerial_ok, aerial = pcall(require, 'aerial')
-if aerial_ok then
-    aerial.setup {}
-end
+require('nvim-treesitter')
+require('nvim-treesitter.configs').setup {
+    ensure_installed = {},
+    sync_install = false,
+    ignore_install = {},
+    highlight = {
+        enable = true,
+        additional_vim_regex_highlighting  = false,
+    },
+    indent = { enable = false },
+    context_commentstring = { enable = true },
+}
 
 -- Telescope configuration
-local telescope_ok, telescope = pcall(require, 'telescope')
-if telescope_ok then
-    local builtin = require'telescope.builtin'
+local tele_builtin = require('telescope.builtin')
 
-    -- Key mapping
-    noremap('n', '<leader>ff', builtin.find_files, { desc = 'Find file ...' })
-    noremap('n', '<leader>fg', builtin.live_grep, { desc = 'Live grep ...' })
-    noremap('n', '<leader>fb', builtin.buffers, { desc = 'Find buffer ...' })
-    noremap('n', '<leader>fh', builtin.help_tags, { desc = 'Find help tag ...' })
+-- Key mapping
+noremap('n', '<leader>ff', tele_builtin.find_files, { desc = 'Find file ...' })
+noremap('n', '<leader>fg', tele_builtin.live_grep, { desc = 'Live grep ...' })
+noremap('n', '<leader>fb', tele_builtin.buffers, { desc = 'Find buffer ...' })
+noremap('n', '<leader>fh', tele_builtin.help_tags, { desc = 'Find help tag ...' })
 
-    telescope.setup {
-        defaults = {
-            selection_caret = '->',
-            path_display = { 'truncate' },
-            file_ignore_patterns = {'node_modules'},
-            selection_strategy = 'reset',
-            sorting_strategy = 'descending',
-            layout_strategy = 'horizontal',
+local telescope = require('telescope')
+telescope.setup {
+    defaults = {
+        selection_caret = '->',
+        path_display = { 'truncate' },
+        file_ignore_patterns = {'node_modules'},
+        selection_strategy = 'reset',
+        sorting_strategy = 'descending',
+        layout_strategy = 'horizontal',
+    },
+    extensions = {
+        fzy_native = {
+            override_generic_sorter = true,
+            override_file_sorter = true,
         },
-        extensions = {
-            fzy_native = {
-                override_generic_sorter = true,
-                override_file_sorter = true,
-            },
-            fzf = {
-                fuzzy = true,
-                override_generic_sorter = true,
-                override_file_sorter = true,
-                case_mode = 'smart_case',
-            }
+        fzf = {
+            fuzzy = true,
+            override_generic_sorter = true,
+            override_file_sorter = true,
+            case_mode = 'smart_case',
         }
     }
+}
 
-    if aerial_ok then
-        telescope.load_extension 'aerial'
-    end
+-- Aerial configuration
+require('aerial').setup {}
 
-    -- There's no good way to detect if this plugin is available,
-    -- so just make sure it's installed. Alternatively, just disable
-    -- this part alltogether.
-    if vim.fn.has 'win32' == 1 then
-        telescope.load_extension 'fzy_native'
-    else
-        telescope.load_extension 'fzf'
-    end
+-- Telescope extensions
+telescope.load_extension 'aerial'
+
+-- There's no good way to detect if this plugin is available,
+-- so just make sure it's installed. Alternatively, just disable
+-- this part alltogether.
+if vim.fn.has 'win32' == 1 then
+    telescope.load_extension 'fzy_native'
+else
+    telescope.load_extension 'fzf'
 end
 
-local autopairs_ok, autopairs = pcall(require, 'nvim-autopairs')
-if autopairs_ok then
-    autopairs.setup {}
-end
+require('toggleterm').setup {          -- Fancy terminal buffers
+    -- open_mapping = [['<M-t>']],
+}
 
--- Feline
-local feline_ok, feline = pcall(require, 'feline')
-if feline_ok then
-    feline.setup()
-end
+noremap('n', '<M-t>', '<cmd>ToggleTerm direction=float<CR>')
 
-local toggleterm_ok, toggleterm = pcall(require, 'toggleterm')
-if toggleterm_ok then
-    toggleterm.setup {}
-end
-
--- leap
-local leap_ok, leap = pcall(require, 'leap')
-if leap_ok then
-    leap.add_default_mappings()
-end
-
--- which-key (probably should be last)
-local wk_ok, which_key = pcall(require, 'which-key')
-if wk_ok then
-    which_key.setup {}
-end
+require('gitsigns').setup()             -- Nice gutter symbols for Git status
+require('Comment').setup()              -- Convenient commenting keys
+require('nvim-autopairs').setup {}      -- Auto insert matching bracket paris
+require('feline').setup()               -- Nice statusline
+require('leap').add_default_mappings()  -- Jump aroudn visible screen
+require('which-key').setup {}           -- Show key map options
 
