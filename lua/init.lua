@@ -1,3 +1,5 @@
+require 'impatient'
+
 -- Key Mappings
 
 -- Remap leader character to space
@@ -62,7 +64,7 @@ local set = vim.opt
 set.encoding = 'utf-8'               -- Set the encoding to UTF-8
 set.fileformat = 'unix'              -- Always use Unix line endings
 set.laststatus = 2                   -- Set the status line to have 2 rows
-set.scrolloff = 3                    -- Always keep three lines below the cursor when scrolling
+set.scrolloff = 5                    -- Always keep three lines below the cursor when scrolling
 set.showmode = false                 -- Hide the mode from the default status bar
 set.backup = false                   -- do not keep a backup file, use versions instead
 set.history = 50                     -- Keep 50 lines of command line history
@@ -124,40 +126,15 @@ vim.cmd('syntax on')
 set.background = 'dark'
 vim.cmd('colorscheme nightfox')
 
-----------------------
--- Plugin Detection --
-----------------------
+-- ----------------
+-- Neovide setup --
+-- ----------------
 
--- func! s:CheckNewPlugins()
---     let pluginPath = expand(stdpath('data') . '/site/pack/0/start')
---     let cmd = 'ls "' . pluginPath . '"'
---     if has('win32')
---         let cmd = 'DIR /B "' . pluginPath . '"'
---     endif
---
---     let newPlugins = systemlist(cmd)
---     let pluginNoteFile = expand('~/.nvim_plugins')
---     let curPlugins = []
---     if filereadable(pluginNoteFile)
---         let curPlugins = readfile(pluginNoteFile)
---     endif
---     for plugin in newPlugins
---         let plugin = substitute(plugin, '\r', '', '')
---         if index(curPlugins, plugin) < 0
---             let docPath = finddir('doc', pluginPath . '/' . plugin)
---             if docPath != ''
---                 execute 'helptags' docPath
---                 echomsg 'Added help tags for' plugin
---             endif
---
---             " We'll write the plugin to the list regardless of its doc
---             " situation
---             call writefile([plugin], pluginNoteFile, 'a')
---         endif
---     endfor
--- endfunction
---
--- call s:CheckNewPlugins()
+if vim.g.neovide then
+    vim.g.neovide_floating_blur_amount_x = 8.0
+    vim.g.neovide_floating_blur_amount_y = 8.0
+    vim.g.neovide_refresh_rate_idle = 5
+end
 
 ----------------------
 ---- Plugin configs --
@@ -168,9 +145,6 @@ vim.g.vim_json_syntax_conceal = 0  -- Don't hide quotes in JSON files
 
 -- EditorConfig
 vim.g.EditorConfig_exclude_patterns = {'fugitive://.*', 'scp://.*'}
-
--- Make LUA loading faster
-require('impatient')
 
 -- Mason and LSP bridge
 require('mason').setup()
@@ -300,7 +274,8 @@ end
 
 local cmp_nvim_lsp = require('cmp_nvim_lsp')
 local lsp = require('lspconfig')
-local capabilities = cmp_nvim_lsp.update_capabilities(vim.lsp.protocol.make_client_capabilities())
+-- local capabilities = cmp_nvim_lsp.update_capabilities(vim.lsp.protocol.make_client_capabilities())
+local capabilities = cmp_nvim_lsp.default_capabilities(vim.lsp.protocol.make_client_capabilities())
 lsp.rust_analyzer.setup {
     capabilities = capabilities,
     on_attach = on_attach,
@@ -391,7 +366,7 @@ noremap('n', '<M-t>', '<cmd>ToggleTerm direction=float<CR>')
 require('gitsigns').setup()             -- Nice gutter symbols for Git status
 require('Comment').setup()              -- Convenient commenting keys
 require('nvim-autopairs').setup {}      -- Auto insert matching bracket paris
-require('feline').setup()               -- Nice statusline
 require('leap').add_default_mappings()  -- Jump aroudn visible screen
 require('which-key').setup {}           -- Show key map options
 
+-- use 'navarasu/onedark.nvim'
