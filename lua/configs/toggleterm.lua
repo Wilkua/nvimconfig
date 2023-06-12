@@ -4,9 +4,7 @@ local noremap = function (mode, lhs, rhs, opts)
     vim.keymap.set(mode, lhs, rhs, opts)
 end
 
-require('toggleterm').setup {
-    open_mapping = [[ <M-t> ]],
-}
+require('toggleterm').setup {}
 
 noremap('n', '<leader>t', '<cmd>ToggleTerm direction=float<CR>')
 
