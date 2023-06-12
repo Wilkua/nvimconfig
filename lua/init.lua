@@ -1,4 +1,6 @@
-require 'impatient'
+-- Speed up lua loading
+-- Neovim 0.9+
+vim.loader.enable()
 
 -- Key Mappings
 
@@ -121,11 +123,6 @@ else
     set.guifont = 'FiraCode_Nerd_Font_Mono:h12'
 end
 
--- Syntax Highlighting
-vim.cmd('syntax on')
-set.background = 'dark'
-vim.cmd('colorscheme nightfox')
-
 -- ----------------
 -- Neovide setup --
 -- ----------------
@@ -146,227 +143,109 @@ vim.g.vim_json_syntax_conceal = 0  -- Don't hide quotes in JSON files
 -- EditorConfig
 vim.g.EditorConfig_exclude_patterns = {'fugitive://.*', 'scp://.*'}
 
--- Mason and LSP bridge
-require('mason').setup()
-require('mason-lspconfig').setup()
-
--- Replace vim notify with better one
-vim.notify = require('notify')
-
--- nvim-cmp
-local cmp = require('cmp')
-local luasnip = require('luasnip')
-
-local function has_words_before()
-    local line, col = unpack(vim.api.nvim_win_get_cursor(0))
-    return col ~= 0 and vim.api.nvim_buf_get_lines(0, line - 1, line, true)[1]:sub(col, col):match "%s" == nil
+function get_config(pkg)
+    return string.format('require "configs/%s"', pkg)
 end
 
-cmp.setup {
-    snippet = {
-        expand = function(args)
-            luasnip.lsp_expand(args.body)
-        end,
-    },
-    window = {
-        completion = cmp.config.window.bordered(),
-        documentation = cmp.config.window.bordered(),
-    },
-    mapping = cmp.mapping.preset.insert({
-        ["<Up>"] = cmp.mapping.select_prev_item(),
-        ["<Down>"] = cmp.mapping.select_next_item(),
-        ["<C-p>"] = cmp.mapping.select_prev_item(),
-        ["<C-n>"] = cmp.mapping.select_next_item(),
-        ["<C-k>"] = cmp.mapping.select_prev_item(),
-        ["<C-j>"] = cmp.mapping.select_next_item(),
-        ["<C-d>"] = cmp.mapping(cmp.mapping.scroll_docs(-1), { "i", "c" }),
-        ["<C-f>"] = cmp.mapping(cmp.mapping.scroll_docs(1), { "i", "c" }),
-        ["<C-Space>"] = cmp.mapping(cmp.mapping.complete(), { "i", "c" }),
-        ["<C-y>"] = cmp.config.disable,
-        ["<C-e>"] = cmp.mapping {
-          i = cmp.mapping.abort(),
-          c = cmp.mapping.close(),
-        },
-        ["<CR>"] = cmp.mapping.confirm { select = false },
-        ["<Tab>"] = cmp.mapping(function(fallback)
-            if cmp.visible() then
-                cmp.select_next_item()
-            elseif luasnip.expandable() then
-                luasnip.expand()
-            elseif luasnip.expand_or_jumpable() then
-                luasnip.expand_or_jump()
-            elseif has_words_before() then
-                cmp.complete()
-            else
-                fallback()
-            end
-        end, { "i",  "s" }),
-        ["<S-Tab>"] = cmp.mapping(function(fallback)
-            if cmp.visible() then
-                cmp.select_prev_item()
-            elseif luasnip.jumpable(-1) then
-                luasnip.jump(-1)
-            else
-                fallback()
-            end
-        end, { "i", "s" }),
-    }),
-    sources = cmp.config.sources({
-        { name = 'nvim_lsp' },
-        { name = 'luasnip' },
-    }, {
-        { name = 'buffer' },
-    })
-}
+local ensure_packer = function()
+  local fn = vim.fn
+  local install_path = fn.stdpath('data')..'/site/pack/packer/start/packer.nvim'
+  if fn.empty(fn.glob(install_path)) > 0 then
+    fn.system({'git', 'clone', '--depth', '1', 'https://github.com/wbthomason/packer.nvim', install_path})
+    vim.cmd [[packadd packer.nvim]]
+    return true
+  end
+  return false
+end
 
--- CMP file types
-cmp.setup.filetype('gitcommit', {
-    sources = cmp.config.sources({
-        { name = 'cmp_git' }, -- You can specify the `cmp_git` source if you were installed it.
-    }, {
-        { name = 'buffer' },
-    })
-})
+local packer_bootstrap = ensure_packer()
 
--- Use buffer source for `/` (if you enabled `native_menu`, this won't work anymore).
-cmp.setup.cmdline('/', {
-    mapping = cmp.mapping.preset.cmdline(),
-    sources = {
-        { name = 'buffer' }
+return require('packer').startup(function(use)
+    use 'wbthomason/packer.nvim'
+
+    use {
+        'williamboman/mason.nvim',
+        requires = { 'williamboman/mason-lspconfig.nvim' },
+        config = get_config 'mason',
     }
-})
 
--- Use cmdline & path source for ':' (if you enabled `native_menu`, this won't work anymore).
-cmp.setup.cmdline(':', {
-    mapping = cmp.mapping.preset.cmdline(),
-    sources = cmp.config.sources({
-        { name = 'path' }
-    }, {
-        { name = 'cmdline' }
-    })
-})
+    use { 'rcarriga/nvim-notify', config = get_config 'nvim-notify' }
 
--- Set up lspconfig.
-
--- Setup lsp funcitonality
-noremap('n', '<leader>e', vim.diagnostic.open_float, { desc = 'Open diagnostics', silent = true })
-noremap('n', '[d', vim.diagnostic.goto_prev, { desc = 'Prev diagnostic', silent = true })
-noremap('n', ']d', vim.diagnostic.goto_next, { desc = 'Next diagnostic', silent = true })
-noremap('n', '<leader>q', vim.diagnostic.setloclist, { desc = 'Set loclist', silent = true })
-
-local on_attach = function (client, bufnr)
-    noremap('n', 'gD', vim.lsp.buf.declaration, { desc = 'Go to declaration', silent = true, buffer = bufnr })
-    noremap('n', 'gd', vim.lsp.buf.definition, { desc = 'Go to definition', silent = true, buffer = bufnr })
-    noremap('n', 'K', vim.lsp.buf.hover, { desc = 'Hover info', silent = true, buffer = bufnr })
-    noremap('n', 'gi', vim.lsp.buf.implementation, { desc = 'List implementations', silent = true, buffer = bufnr })
-    noremap({'n', 'i'}, '<C-k>', vim.lsp.buf.signature_help, { desc = 'Signature help', silent = true, buffer = bufnr })
-    noremap('n', '<leader>wa', vim.lsp.buf.add_workspace_folder, { desc = 'Add workspace folder', silent = true, buffer = bufnr })
-    noremap('n', '<leader>wr', vim.lsp.buf.remove_workspace_folder, { desc = 'Remove workspace folder', silent = true, buffer = bufnr })
-    noremap('n', '<leader>wl', function()
-        print(vim.inspect(vim.lsp.buf.list_workspace_folders()))
-    end, { desc = 'List workspace folders', silent = true, buffer = bufnr })
-    noremap('n', '<leader>D', vim.lsp.buf.type_definition, { desc = 'Show type definition', silent = true, buffer = bufnr })
-    noremap('n', '<leader>rn', vim.lsp.buf.rename, { desc = 'Rename symbol', silent = true, buffer = bufnr })
-    noremap('n', '<leader>ca', vim.lsp.buf.code_action, { desc = 'Select code action', silent = true, buffer = bufnr })
-    noremap('n', 'gr', vim.lsp.buf.references, { desc = 'List references', silent = true, buffer = bufnr })
-    noremap('n', '<leader>fm', function() vim.lsp.buf.format { async = true } end, { desc = 'Format buffer', silent = true, buffer = bufnr })
-end
-
-local cmp_nvim_lsp = require('cmp_nvim_lsp')
-local lsp = require('lspconfig')
--- local capabilities = cmp_nvim_lsp.update_capabilities(vim.lsp.protocol.make_client_capabilities())
-local capabilities = cmp_nvim_lsp.default_capabilities(vim.lsp.protocol.make_client_capabilities())
-lsp.rust_analyzer.setup {
-    capabilities = capabilities,
-    on_attach = on_attach,
-}
-lsp.tsserver.setup {
-    capabilities = capabilities,
-    on_attach = on_attach,
-}
-
--- null-ls cconfigurations
-local null_ls = require('null-ls')
-null_ls.setup {
-    sources = {
-        null_ls.builtins.diagnostics.eslint_d,
-        null_ls.builtins.diagnostics.php,
-        null_ls.builtins.formatting.rustfmt,
-    },
-}
-
--- Treesitter configuration
-require('nvim-treesitter')
-require('nvim-treesitter.configs').setup {
-    ensure_installed = {},
-    sync_install = false,
-    ignore_install = {},
-    highlight = {
-        enable = true,
-        additional_vim_regex_highlighting  = false,
-    },
-    indent = { enable = false },
-    context_commentstring = { enable = true },
-}
-
--- Telescope configuration
-local tele_builtin = require('telescope.builtin')
-
--- Key mapping
-noremap('n', '<leader>ff', tele_builtin.find_files, { desc = 'Find file ...' })
-noremap('n', '<leader>fg', tele_builtin.live_grep, { desc = 'Live grep ...' })
-noremap('n', '<leader>fb', tele_builtin.buffers, { desc = 'Find buffer ...' })
-noremap('n', '<leader>fh', tele_builtin.help_tags, { desc = 'Find help tag ...' })
-
-local telescope = require('telescope')
-telescope.setup {
-    defaults = {
-        selection_caret = '->',
-        path_display = { 'truncate' },
-        file_ignore_patterns = {'node_modules'},
-        selection_strategy = 'reset',
-        sorting_strategy = 'descending',
-        layout_strategy = 'horizontal',
-    },
-    extensions = {
-        fzy_native = {
-            override_generic_sorter = true,
-            override_file_sorter = true,
+    use {
+        'hrsh7th/nvim-cmp',
+        requires = {
+            'hrsh7th/cmp-buffer',
+            'hrsh7th/cmp-cmdline',
+            'hrsh7th/cmp-nvim-lsp',
+            'hrsh7th/cmp-path',
+            'hrsh7th/cmp-nvim-lua',
+            'saadparwaiz1/cmp_luasnip',
+            'L3MON4D3/LuaSnip',
         },
-        fzf = {
-            fuzzy = true,
-            override_generic_sorter = true,
-            override_file_sorter = true,
-            case_mode = 'smart_case',
+        config = get_config 'nvim-cmp',
+    }
+
+    use {
+        'neovim/nvim-lspconfig',
+        after = 'cmp-nvim-lsp',
+        config = get_config 'nvim-lspconfig',
+    }
+
+    use { 'jose-elias-alvarez/null-ls.nvim', config = get_config 'null-ls' }
+
+    use {
+        'nvim-treesitter/nvim-treesitter',
+        requires = {
+            'windwp/nvim-ts-autotag',
+            'JoosepAlviste/nvim-ts-context-commentstring',
+        },
+        config = get_config 'nvim-treesitter',
+    }
+
+    use {
+        'nvim-telescope/telescope.nvim',
+        requires = {
+            'nvim-lua/plenary.nvim',
+            'nvim-tree/nvim-web-devicons',
+            'stevearc/aerial.nvim',
+            {
+                'nvim-telescope/telescope-fzf-native.nvim',
+                enabled = vim.fn.has 'win32' == 0 and vim.fn.executable 'make',
+                run = 'make',
+            },
+            {
+                'nvim-telescope/telescope-fzy-native.nvim',
+                enabled = vim.fn.has 'win32' == 1,
+                run = 'git submodules update --init',
+            }
+        },
+        config = get_config 'telescope',
+    }
+
+    vim.cmd [[ let g:neo_tree_remove_legacy_commands = 1 ]]
+    use {
+        'nvim-neo-tree/neo-tree.nvim',
+        cmd = 'Neotree',
+        branch = 'v2.x',
+        requires = { 
+            'nvim-lua/plenary.nvim',
+            'nvim-tree/nvim-web-devicons',
+            'MunifTanjim/nui.nvim',
         }
     }
-}
 
--- Aerial configuration
-require('aerial').setup {}
+    use { 'akinsho/toggleterm.nvim', config = get_config 'toggleterm' }
+    use { 'lewis6991/gitsigns.nvim', config = get_config 'gitsigns' }
+    use { 'numToStr/Comment.nvim', config = get_config 'comment' }
+    use { 'windwp/nvim-autopairs', config = get_config 'nvim-autopairs' }
+    use { 'ggandor/leap.nvim', config = get_config 'leap' }
+    use { 'folke/which-key.nvim', config = get_config 'which-key' }
+    use { 'EdenEast/nightfox.nvim', config = get_config 'nightfox' }
 
--- Telescope extensions
-telescope.load_extension 'aerial'
+    use 'navarasu/onedark.nvim'
+    use 'editorconfig/editorconfig-vim'
 
--- There's no good way to detect if this plugin is available,
--- so just make sure it's installed. Alternatively, just disable
--- this part alltogether.
-if vim.fn.has 'win32' == 1 then
-    telescope.load_extension 'fzy_native'
-else
-    telescope.load_extension 'fzf'
-end
-
-require('toggleterm').setup {          -- Fancy terminal buffers
-    -- open_mapping = [['<M-t>']],
-}
-
-noremap('n', '<M-t>', '<cmd>ToggleTerm direction=float<CR>')
-
-require('gitsigns').setup()             -- Nice gutter symbols for Git status
-require('Comment').setup()              -- Convenient commenting keys
-require('nvim-autopairs').setup {}      -- Auto insert matching bracket paris
-require('leap').add_default_mappings()  -- Jump aroudn visible screen
-require('which-key').setup {}           -- Show key map options
-
--- use 'navarasu/onedark.nvim'
+    if packer_bootstrap then
+        require('packer').sync()
+    end
+end)
