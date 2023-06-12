@@ -195,11 +195,17 @@ return require('packer').startup(function(use)
 
     use {
         'nvim-treesitter/nvim-treesitter',
-        requires = {
-            'windwp/nvim-ts-autotag',
-            'JoosepAlviste/nvim-ts-context-commentstring',
-        },
         config = get_config 'nvim-treesitter',
+    }
+
+    use {
+        'windwp/nvim-ts-autotag',
+        after = 'nvim-treesitter',
+    }
+
+    use {
+        'JoosepAlviste/nvim-ts-context-commentstring',
+        after = 'nvim-treesitter',
     }
 
     use {
@@ -244,6 +250,13 @@ return require('packer').startup(function(use)
 
     use 'navarasu/onedark.nvim'
     use 'editorconfig/editorconfig-vim'
+    use 'tpope/vim-fugitive'
+    use 'tpope/vim-jdaddy'
+    use 'tpope/vim-repeat'
+    use 'tpope/vim-surround'
+    use 'tpope/vim-unimpaired'
+    use 'ludovicchabant/vim-gutentags'
+    use 'wellle/targets.vim'
 
     if packer_bootstrap then
         require('packer').sync()
