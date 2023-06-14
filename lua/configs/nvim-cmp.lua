@@ -1,5 +1,11 @@
 local cmp = require 'cmp'
+local lspkind = require 'lspkind'
 local luasnip = require 'luasnip'
+
+lspkind.init {
+    mode = 'symbol',
+    preset = 'codicons',
+}
 
 local function has_words_before()
     local line, col = unpack(vim.api.nvim_win_get_cursor(0))
@@ -7,6 +13,13 @@ local function has_words_before()
 end
 
 cmp.setup {
+    formatting = {
+        format = lspkind.cmp_format({
+            mode = 'symbol',
+            maxwidth = 50,
+            ellipsis_char = '...',
+        }),
+    },
     snippet = {
         expand = function(args)
             luasnip.lsp_expand(args.body)

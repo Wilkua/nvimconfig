@@ -171,6 +171,15 @@ return require('packer').startup(function(use)
 
     use { 'rcarriga/nvim-notify', config = get_config 'nvim-notify' }
 
+    use 'stevearc/dressing.nvim'
+
+    use {
+      'stevearc/resession.nvim',
+      config = get_config 'resession'
+    }
+
+    use { 'mrjones2014/smart-splits.nvim', tag = 'v1.x' }
+
     use {
         'hrsh7th/nvim-cmp',
         requires = {
@@ -180,6 +189,7 @@ return require('packer').startup(function(use)
             'hrsh7th/cmp-path',
             'hrsh7th/cmp-nvim-lua',
             'saadparwaiz1/cmp_luasnip',
+            'onsails/lspkind.nvim',
             'L3MON4D3/LuaSnip',
         },
         config = get_config 'nvim-cmp',
@@ -216,12 +226,12 @@ return require('packer').startup(function(use)
             'stevearc/aerial.nvim',
             {
                 'nvim-telescope/telescope-fzf-native.nvim',
-                enabled = vim.fn.has 'win32' == 0 and vim.fn.executable 'make',
+                disable = vim.fn.has 'win32' == 1 or vim.fn.executable 'make' == 0,
                 run = 'make',
             },
             {
                 'nvim-telescope/telescope-fzy-native.nvim',
-                enabled = vim.fn.has 'win32' == 1,
+                disable = vim.fn.has 'win32' == 0,
                 run = 'git submodules update --init',
             }
         },
@@ -240,6 +250,12 @@ return require('packer').startup(function(use)
         }
     }
 
+    use {
+        'kevinhwang91/nvim-ufo',
+        requires = 'kevinhwang91/promise-async',
+        config = get_config 'nvim-ufo'
+    }
+
     use { 'akinsho/toggleterm.nvim', config = get_config 'toggleterm' }
     use { 'lewis6991/gitsigns.nvim', config = get_config 'gitsigns' }
     use { 'numToStr/Comment.nvim', config = get_config 'comment' }
@@ -247,6 +263,7 @@ return require('packer').startup(function(use)
     use { 'ggandor/leap.nvim', config = get_config 'leap' }
     use { 'folke/which-key.nvim', config = get_config 'which-key' }
     use { 'EdenEast/nightfox.nvim', config = get_config 'nightfox' }
+    use {'famiu/bufdelete.nvim', cmd = { 'Bdelete', 'Bwipeout' }}
 
     use 'navarasu/onedark.nvim'
     use 'editorconfig/editorconfig-vim'
@@ -255,7 +272,7 @@ return require('packer').startup(function(use)
     use 'tpope/vim-repeat'
     use 'tpope/vim-surround'
     use 'tpope/vim-unimpaired'
-    use 'ludovicchabant/vim-gutentags'
+    use {'ludovicchabant/vim-gutentags', disable = vim.fn.executable 'ctags' == 0 }
     use 'wellle/targets.vim'
 
     if packer_bootstrap then
