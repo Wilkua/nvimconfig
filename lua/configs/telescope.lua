@@ -1,25 +1,19 @@
-local noremap = function (mode, lhs, rhs, opts)
-    local opts = opts or {}
-    if opts['noremap'] == nil then opts['noremap'] = true end
-    vim.keymap.set(mode, lhs, rhs, opts)
-end
-
-local tele_builtin = require('telescope.builtin')
-
-noremap('n', '<leader>ff', tele_builtin.find_files, { desc = 'Find file ...' })
-noremap('n', '<leader>fg', tele_builtin.live_grep, { desc = 'Live grep ...' })
-noremap('n', '<leader>fb', tele_builtin.buffers, { desc = 'Find buffer ...' })
-noremap('n', '<leader>fh', tele_builtin.help_tags, { desc = 'Find help tag ...' })
-
 local tele = require 'telescope'
 tele.setup {
     defaults = {
-        selection_caret = '->',
+        selection_caret = '❯ ',
         path_display = { 'truncate' },
         file_ignore_patterns = {'node_modules'},
         selection_strategy = 'reset',
-        sorting_strategy = 'descending',
-        layout_strategy = 'horizontal',
+        sorting_strategy = 'ascending',
+        layout_strategy = 'vertical',
+        layout_config = {
+            vertical = {
+                prompt_position = 'top',
+                width = 0.5,
+            },
+        },
+        preview = false,
     },
     extensions = {
         fzy_native = {

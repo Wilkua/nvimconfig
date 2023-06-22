@@ -2,62 +2,8 @@
 -- Neovim 0.9+
 vim.loader.enable()
 
--- Key Mappings
-
 -- Remap leader character to space
 vim.g.mapleader = ' '
-
--- Map keys with "remap = true" by default
-local noremap = function (mode, lhs, rhs, opts)
-    local opts = opts or {}
-    if opts['noremap'] == nil then opts['noremap'] = true end
-    vim.keymap.set(mode, lhs, rhs, opts)
-end
-
--- Set arrow keys to move between windows
-noremap('n', '<up>', '<c-w>k')
-noremap('n', '<down>', '<c-w>j')
-noremap('n', '<left>', '<c-w>h')
-noremap('n', '<right>', '<c-w>l')
-
--- Use shift + arrow keys to move windows around
-noremap('n', '<s-up>', '<c-w><s-k>')
-noremap('n', '<s-down>', '<c-w><s-j>')
-noremap('n', '<s-left>', '<c-w><s-h>')
-noremap('n', '<s-right>', '<c-w><s-l>')
-
--- Cancel insert, move windows, start insert
-noremap('i', '<up>', '<esc><c-w>ka')
-noremap('i', '<down>', '<esc><c-w>ja')
-noremap('i', '<left>', '<esc><c-w>ha')
-noremap('i', '<right>', '<esc><c-w>la')
-
--- Shortcut to rapidly toggle 'set list'
-noremap('n', '<leader>l', ':set list!<CR>', { desc = 'Toggle unprintable chars', silent = true })
-
--- Clear search highlighting
-noremap('n', '<esc>', ':noh<cr>', { desc = 'Clear search hilight', silent = true })
-
--- Quick upper- and lowercase word conversion
-noremap('n', '<leader>U', 'gUiw', { desc = 'Uppercase whole word' })
-noremap('n', '<leader>u', 'guiw', { desc = 'Lowercase whole word' })
-
--- Don't use Ex mode, use Q for formatting
-vim.keymap.set('n', 'Q', 'gq', { desc = 'Format with motion' })
-
--- CTRL-U in insert mode deletes a lot.  Use CTRL-G u to first break undo,
--- so that you can undo CTRL-U after inserting a line break.
-noremap('i', '<c-u>', '<c-g>u<c-U>')
-
--- Center the line moved to with G
-noremap('n', 'G', 'Gzz')
-
--- Center the found search item
-noremap('n', 'n', 'nzz')
-
--- Faster screen movement
-noremap('n', '<c-e>', '5<c-e>')
-noremap('n', '<c-y>', '5<c-y>')
 
 -- Settings
 
@@ -132,6 +78,9 @@ if vim.g.neovide then
     vim.g.neovide_floating_blur_amount_y = 8.0
     vim.g.neovide_refresh_rate_idle = 5
 end
+
+-- Load Keymap --
+require 'mappings'
 
 ----------------------
 ---- Plugin configs --
