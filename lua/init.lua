@@ -12,7 +12,8 @@ local set = vim.opt
 set.encoding = 'utf-8'               -- Set the encoding to UTF-8
 set.fileformat = 'unix'              -- Always use Unix line endings
 set.laststatus = 2                   -- Set the status line to have 2 rows
-set.scrolloff = 5                    -- Always keep three lines below the cursor when scrolling
+set.scrolloff = 5                    -- Always keep five lines below and above the cursor when scrolling
+set.sidescrolloff = 8                -- Always keep characters at te edge of the window
 set.showmode = false                 -- Hide the mode from the default status bar
 set.backup = false                   -- do not keep a backup file, use versions instead
 set.history = 50                     -- Keep 50 lines of command line history
@@ -24,6 +25,7 @@ set.expandtab = true                 -- Turn tabs into spaces.
 set.number = true                    -- Always enable line numbers
 set.relativenumber = true            -- Enable relative line numbers
 set.autoindent = true                -- Turn on auto indent
+set.copyindent = true                -- Copy indent structure from other lines
 set.cursorline = true                -- Highlight the line the cursor is on
 set.wrap = false                     -- Disable line wrapping
 set.mousehide = true                 -- Hide the mouse when typing text
@@ -38,18 +40,9 @@ set.hlsearch = true                  -- Highlight search results
 set.gdefault = true                  -- Default to using 'global' substitution
 set.virtualedit = 'block'            -- Block selections are always rectangular
 set.completeopt = 'menuone,noselect' -- always show menu; don't auto select; no preview
+set.timeoutlen = 500                 -- Faster timeout for key sequence commands
+set.updatetime = 400                 -- Faster time before updating swap
 set.path:append('**')                     -- Include working direcotry in search path
--- set.listchars = "tab:\u25B8 ,trail:\uB7,eol:\uAC" -- Set hidden characters
-
--- Custom statusline setup
--- local statusln = ''
--- statusln = statusln .. '%(\ %{mode()}\ %)'
--- statusln = statusln .. '%<%.60f%(\ [%M%R%H]%)'
--- statusln = statusln .. '%='
--- statusln = statusln .. '%y\ %{strlen(&fenc)?&fenc:&enc}'
--- statusln = statusln .. "%{strlen(&ff)?'['.&ff.']':''}"
--- statusln = statusln .. '%(\ %c\ %P\ %)'
--- set.statusline = statusln
 
 if vim.fn.has('nvim') == 1 then
     -- For Neovim 0.1.3 and 0.1.4 < https://github.com/neovim/neovim/pull/2198 >
@@ -127,7 +120,7 @@ return require('packer').startup({function(use)
       config = get_config 'resession'
     }
 
-    use { 'mrjones2014/smart-splits.nvim', tag = 'v1.x' }
+    use { 'mrjones2014/smart-splits.nvim', tag = 'v1.2.*' }
 
     use {
         'hrsh7th/nvim-cmp',
