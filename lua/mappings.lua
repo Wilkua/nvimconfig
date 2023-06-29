@@ -49,8 +49,8 @@ noremap('n', 'G', 'Gzz')
 noremap('n', 'n', 'nzz')
 
 -- Faster screen movement
-noremap('n', '<c-e>', '5<c-e>')
-noremap('n', '<c-y>', '5<c-y>')
+noremap({'n', 'v'}, '<c-e>', '5<c-e>')
+noremap({'n', 'v'}, '<c-y>', '5<c-y>')
 
 -- Faster saving
 noremap('n', '<leader>w', '<cmd>w<CR>', { desc = 'Save file' })
@@ -102,4 +102,10 @@ if ok then
     noremap('n', 'zR', ufo.openAllFolds, { desc = 'Open all folds' })
     noremap('n', 'zM', ufo.closeAllFolds, { desc = 'Close all folds' })
     noremap('n', 'zp', ufo.peekFoldedLinesUnderCursor, { desc = 'Peek fold contents' })
+end
+
+local ok, _ = pcall(require, 'toggleterm')
+if ok then
+noremap('n', '<leader>t', '<cmd>ToggleTerm toggle<CR>', { desc = 'Toggle terminal' })
+noremap('t', '<leader>tt', '<cmd>ToggleTerm toggle<CR>', { desc = 'Toggle terminal' })
 end

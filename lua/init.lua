@@ -42,7 +42,8 @@ set.virtualedit = 'block'            -- Block selections are always rectangular
 set.completeopt = 'menuone,noselect' -- always show menu; don't auto select; no preview
 set.timeoutlen = 500                 -- Faster timeout for key sequence commands
 set.updatetime = 400                 -- Faster time before updating swap
-set.path:append('**')                     -- Include working direcotry in search path
+set.path:append('**')                -- Include working direcotry in search path
+set.signcolumn = 'yes'               -- Always show sign column
 
 if vim.fn.has('nvim') == 1 then
     -- For Neovim 0.1.3 and 0.1.4 < https://github.com/neovim/neovim/pull/2198 >
@@ -198,7 +199,7 @@ return require('packer').startup({function(use)
         config = get_config 'nvim-ufo'
     }
 
-    use { 'akinsho/toggleterm.nvim', config = get_config 'toggleterm' }
+    use { 'akinsho/toggleterm.nvim', tag = 'v2.7.*', config = get_config 'toggleterm' }
     use { 'lewis6991/gitsigns.nvim', config = get_config 'gitsigns' }
     use { 'numToStr/Comment.nvim', config = get_config 'comment' }
     use { 'windwp/nvim-autopairs', config = get_config 'nvim-autopairs' }
