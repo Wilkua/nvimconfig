@@ -9,6 +9,7 @@ local colors = {
     StatusDiagHint = utils.get_highlight('DiagnosticHint').fg,
     StatusDiagInfo = utils.get_highlight('DiagnosticInfo').fg,
     StatusDiagWarn = utils.get_highlight('DiagnosticWarn').fg,
+    StatusFileName = utils.get_highlight('Directory').fg,
     StatusGitRemoved = utils.get_highlight('diffRemoved').fg,
     StatusGitAdded = utils.get_highlight('diffAdded').fg,
     StatusGitChanged = utils.get_highlight('diffChanged').fg,
@@ -121,12 +122,12 @@ local file_name_component = {
         local filename = vim.fn.fnamemodify(self.filename, ':.')
         if filename == '' then return '[No Name]' end
 
-        if not conditions.width_percent_below(#filename, 0.25) then
-            filename = vim.fn.pathshorten(filename)
+        if not conditions.width_percent_below(#filename, 0.35) then
+            filename = vim.fn.fnamemodify(self.filename, ':t')
         end
         return filename
     end,
-    hl = { fg = utils.get_highlight('Directory').fg },
+    hl = { fg = 'StatusFileName' },
 }
 
 local file_flags_component = {
@@ -156,18 +157,19 @@ local file_name_modifier = {
 
 file_info_component = utils.insert(file_info_component,
     file_icon_component,
+    { provider = '%<' },
     utils.insert(file_name_modifier, file_name_component),
     file_flags_component,
-    { provider = ' ' },
-    { provider = '%<'}
+    { provider = ' ' }
 )
 
 local file_type_component = {
-    { -- filetype
-        provider = function()
-            return string.upper(vim.bo.filetype) .. ' '
-        end,
-    },
+    provider = function()
+        return string.upper(vim.bo.filetype) .. ' '
+    end,
+}
+
+local file_encoding_component = {
     { -- icon for fileformat
         provider = function()
             if vim.bo.fileformat == 'unix' then
@@ -275,6 +277,24 @@ local diagnostics_component = {
 
 }
 
+local macro_info_component = {
+    condition = function()
+        return vim.fn.reg_recording() ~= ''
+    end,
+    provider = ' ',
+    hl = { fg = 'StatusOrange' },
+    utils.surround({ '󰜴', ' ' }, nil, {
+        provider = function()
+            return vim.fn.reg_recording()
+        end,
+        hl = { fg = 'StatusOrange' },
+    }),
+    update = {
+        'RecordingEnter',
+        'RecordingLeave',
+     }
+}
+
 local scroll_component = {
     static = {
         bits = { '▁', '▂', '▃', '▄', '▅', '▆', '▇', '█' }
@@ -288,27 +308,60 @@ local scroll_component = {
     hl = { bg = 'StatusBrightBG' },
 }
 
+local helpfile_name_component = {
+    condition = function()
+        return vim.bo.filetype == 'help'
+    end,
+    provider = function()
+        local fname = vim.api.nvim_buf_get_name(0)
+        return vim.fn.fnamemodify(fname, ':t')
+    end,
+    hl = { fg = 'StatusFileName' },
+}
+
 local filler_component = { provider = '%=' }
+
+local help_statusline = {
+    condition = function()
+        return conditions.buffer_matches({
+            buftype = { 'help', 'nofile', 'prompt', 'quickfix' },
+            filetype = { '^git.*', 'fugitive' },
+        })
+    end,
+
+    file_type_component,
+   helpfile_name_component,
+   filler_component,
+}
+
+local main_statusline = {
+    hl = function()
+        if conditions.is_active() then
+            return 'StatusLine'
+        end
+        return 'StatusLineNC'
+    end,
+
+    utils.surround({ '', ' ' }, 'StatusBrightBG', { mode_component }),
+    git_repo_component,
+    file_info_component,
+    git_status_component,
+    diagnostics_component,
+    filler_component,
+    macro_info_component,
+    file_type_component,
+    file_encoding_component,
+    scroll_component,
+}
 
 require('heirline').setup {
     opts = {
         colors = colors,
     },
     statusline = {
-        hl = function()
-            if conditions.is_active() then
-                return 'StatusLine'
-            end
-            return 'StatusLineNC'
-        end,
+        fallthrough = false,
 
-        utils.surround({ '', ' ' }, 'StatusBrightBG', { mode_component }),
-        git_repo_component,
-        file_info_component,
-        git_status_component,
-        diagnostics_component,
-        filler_component,
-        file_type_component,
-        scroll_component,
+        help_statusline,
+        main_statusline,
     },
 }
