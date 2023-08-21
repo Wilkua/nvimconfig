@@ -264,7 +264,7 @@ local diagnostics_component = {
     },
     {
         provider = function(self)
-            return self.warnings > 0 and (self.warning_icon .. self.warnings .. ' ')
+            return self.warnings > 0 and (self.warn_icon .. self.warnings .. ' ')
         end,
         hl = { fg = 'StatusDiagWarn' },
     },
