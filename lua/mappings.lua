@@ -49,8 +49,12 @@ noremap('n', 'G', 'Gzz')
 noremap('n', 'n', 'nzz')
 
 -- Faster screen movement
-noremap({'n', 'v'}, '<c-e>', '5<c-e>')
-noremap({'n', 'v'}, '<c-y>', '5<c-y>')
+noremap({'n', 'v'}, '<c-e>', "v:count == 0 ? '5<c-e>' : '<c-e>'", { expr = true })
+noremap({'n', 'v'}, '<c-y>', "v:count == 0 ? '5<c-y>' : '<c-y>'", { expr = true })
+
+-- Other movement improvements
+noremap({'n', 'v'}, 'j', "v:count == 0 ? 'gj' : 'j'", { expr = true })
+noremap({'n', 'v'}, 'k', "v:count == 0 ? 'gk' : 'k'", { expr = true })
 
 -- Faster saving
 noremap('n', '<leader>w', '<cmd>w<CR>', { desc = 'Save file' })
