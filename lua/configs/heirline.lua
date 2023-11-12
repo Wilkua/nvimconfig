@@ -351,7 +351,7 @@ local main_statusline = {
     macro_info_component,
     file_type_component,
     file_encoding_component,
-    scroll_component,
+    -- scroll_component,
 }
 
 require('heirline').setup {

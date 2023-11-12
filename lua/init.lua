@@ -80,7 +80,7 @@ vim.g.vim_json_syntax_conceal = 0  -- Don't hide quotes in JSON files
 vim.g.EditorConfig_exclude_patterns = {'fugitive://.*', 'scp://.*'}
 
 -- Load plugins and configs --
-require 'plugins'
+require 'loader'
 
 -- Load Keymap --
 require 'mappings'
