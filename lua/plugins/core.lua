@@ -9,22 +9,36 @@ return {
         end,
     },
 
-    { 'stevearc/dressing.nvim' },
-    { 'windwp/nvim-ts-autotag' },
-    { 'JoosepAlviste/nvim-ts-context-commentstring' },
-    { 'windwp/nvim-autopairs', config = true },
+    "nvim-lua/plenary.nvim",
+    'stevearc/dressing.nvim',
+    {
+        'windwp/nvim-autopairs',
+        opts = { check_ts = true },
+        config = function(_, opts)
+            local ap = require 'nvim-autopairs'
+            ap.setup(opts)
+
+            local ok, cmp = pcall(require, 'cmp')
+            if ok then
+                cmp.event:on('confirm_done', require('nvim-autopairs.completion.cmp').on_confirm_done { tex = false })
+            end
+        end,
+    },
     { 'ggandor/leap.nvim', config = function() require('leap').add_default_mappings() end },
-    { 'folke/which-key.nvim', config = true },
+    {
+        'folke/which-key.nvim',
+        event = 'VeryLazy',
+        opts = { disable = { filetypes = { "TelescopePrompt" } } },
+    },
     {'famiu/bufdelete.nvim', cmd = { 'Bdelete', 'Bwipeout' }},
     { 'NvChad/nvim-colorizer.lua', config = true },
 
-    { 'navarasu/onedark.nvim' },
-    { 'editorconfig/editorconfig-vim' },
-    { 'tpope/vim-fugitive' },
-    { 'tpope/vim-jdaddy' },
-    { 'tpope/vim-repeat' },
-    { 'tpope/vim-surround' },
-    { 'tpope/vim-unimpaired' },
+    'editorconfig/editorconfig-vim',
+    'tpope/vim-fugitive',
+    'tpope/vim-jdaddy',
+    'tpope/vim-repeat',
+    'tpope/vim-surround',
+    'tpope/vim-unimpaired',
     {'ludovicchabant/vim-gutentags', enable = vim.fn.executable 'ctags' == 1 },
-    { 'wellle/targets.vim' },
+    'wellle/targets.vim',
 }
