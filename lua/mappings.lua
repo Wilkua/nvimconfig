@@ -110,6 +110,11 @@ end
 
 local ok, _ = pcall(require, 'toggleterm')
 if ok then
-noremap('n', '<leader>t', '<cmd>ToggleTerm toggle<CR>', { desc = 'Toggle terminal' })
+noremap('n', '<leader>tt', '<cmd>ToggleTerm toggle<CR>', { desc = 'Toggle terminal' })
 noremap('t', '<leader>tt', '<cmd>ToggleTerm toggle<CR>', { desc = 'Toggle terminal' })
+end
+
+local ok, _ = pcall(require, 'neo-tree')
+if ok then
+    noremap('n', '<leader>tr', '<cmd>Neotree toggle<CR>', { desc = 'Toggle Neotree display' })
 end
