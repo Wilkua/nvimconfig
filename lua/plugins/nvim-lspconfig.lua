@@ -1,4 +1,11 @@
 return {
     'neovim/nvim-lspconfig',
-    init = function() require 'configs.nvim-lspconfig' end,
+    dependencies = {
+        {
+            'williamboman/mason-lspconfig.nvim',
+            cmd = { 'LspInstall', 'LspUninstall' },
+            config = true,
+        },
+    },
+    config = require 'configs.nvim-lspconfig',
 }
