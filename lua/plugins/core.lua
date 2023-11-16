@@ -39,6 +39,6 @@ return {
     'tpope/vim-repeat',
     'tpope/vim-surround',
     'tpope/vim-unimpaired',
-    {'ludovicchabant/vim-gutentags', enable = vim.fn.executable 'ctags' == 1 },
+    {'ludovicchabant/vim-gutentags', enabled = vim.fn.executable 'ctags' == 1 },
     'wellle/targets.vim',
 }
