@@ -5,9 +5,11 @@ return {
         init = function()
             vim.cmd [[syntax on]]
             vim.g.background = 'dark'
-            vim.cmd [[colorscheme nightfox]]
+            vim.cmd [[colorscheme carbonfox]]
         end,
     },
+    { 'folke/tokyonight.nvim', version = '*', priority = 1000 },
+    { "catppuccin/nvim", name = "catppuccin", priority = 1000 },
 
     "nvim-lua/plenary.nvim",
     'stevearc/dressing.nvim',
