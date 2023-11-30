@@ -30,6 +30,9 @@ return {
         context_commentstring = { enable = true },
         incremental_selection = { enable = true },
     },
+    init = function()
+        vim.g.skip_ts_context_commentstring_module = true
+    end,
     config = function(_, opts)
         require 'nvim-treesitter'
         require('nvim-treesitter.configs').setup(opts)
