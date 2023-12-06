@@ -1,5 +1,8 @@
 local conditions = require 'heirline.conditions'
 local utils = require 'heirline.utils'
+local icons = require 'configs.heirline.icons'
+
+local mode_component = require 'configs.heirline.mode_component'
 
 local colors = {
     StatusBrightBG = utils.get_highlight('Folded').bg,
@@ -33,66 +36,6 @@ local colors = {
     StatusCyan = utils.get_highlight('Special').fg,
 }
 
-local mode_component = {
-    init = function(self)
-        self.mode = vim.fn.mode(1)
-    end,
-    static = {
-        mode_names = {
-            n = 'N', no = 'N?', nov = 'N?',
-            noV = 'N?', ["no\22"] = 'N?', niI = 'Ni',
-            niR = 'Nr', niV = 'Nv', nt = 'Nt',
-
-            v = 'V', vs = 'Vs', V = 'V_',
-            Vs = 'Vs', ["\22"] = '^V', ["\22s"] = '^V',
-
-            s = 'S', S = 'S_', ["\19"] = '^S',
-
-            i = 'I', ic = 'Ic', ix = 'Ix',
-
-            R = 'R', Rc = 'Rc', Rx = 'Rx',
-            Rv = 'Rv', Rvc = 'Rv', Rvx = 'Rv',
-
-            c = 'C', cv = 'Ex',
-
-            r = '...',
-            rm = 'M',
-            ["r?"] = '?',
-            ["!"] = '!',
-            t = 'T',
-        },
-        mode_colors = {
-            n = 'StatusModeN' ,
-            i = 'StatusModeI',
-            v = 'StatusModeV',
-            V =  'StatusModeV',
-            ["\22"] =  'StatusModeV',
-            c =  'StatusModeC',
-            s =  'StatusModeS',
-            S =  'StatusModeS',
-            ["\19"] =  'StatusModeS',
-            R =  'StatusModeR',
-            r =  'StatusModeR',
-            ['!'] =  'StatusModeSpecial',
-            t =  'StatusModeT',
-        }
-    },
-    provider = function(self)
-        return ' %-2('..self.mode_names[self.mode]..'%)'
-    end,
-    hl = function(self)
-        local mode = self.mode:sub(1, 1)
-        return { fg = self.mode_colors[mode], bold = true, }
-    end,
-    update = {
-        'ModeChanged',
-        pattern = '*:*',
-        callback = vim.schedule_wrap(function()
-            vim.cmd 'redrawstatus'
-        end),
-    },
-}
-
 local file_info_component = {
     init = function(self)
         self.filename = vim.api.nvim_buf_get_name(0)
@@ -100,7 +43,7 @@ local file_info_component = {
 }
 
 local file_icon_component = {
-    condition = function(self)
+    condition = function()
         local ok, _ = pcall(require, 'nvim-web-devicons')
         return ok
     end,
@@ -110,7 +53,7 @@ local file_icon_component = {
         self.icon, self.icon_color = require('nvim-web-devicons').get_icon_color(filename, extension, { default = true })
     end,
     provider = function(self)
-        return self.icon and (self.icon .. ' ')
+        return self.icon and (self.icon .. ' ') or ''
     end,
     hl = function(self)
         return { fg = self.icon_color }
@@ -201,7 +144,7 @@ local git_repo_component = {
 }
 
 local git_status_component = {
-    condition = function(self)
+    condition = function()
         if conditions.is_git_repo() then
             local status_dict = vim.b.gitsigns_status_dict
             local has_changes = status_dict.added ~= 0 or status_dict.removed ~= 0 or status_dict.changed ~= 0
@@ -334,6 +277,7 @@ local help_statusline = {
    filler_component,
 }
 
+local space_component = { provider = ' ' }
 local main_statusline = {
     hl = function()
         if conditions.is_active() then
@@ -342,7 +286,10 @@ local main_statusline = {
         return 'StatusLineNC'
     end,
 
-    utils.surround({ '', ' ' }, 'StatusBrightBG', { mode_component }),
+    { provider = icons.drawing.bar_half, hl = { fg = 'StatusBlue' } },
+    space_component,
+    mode_component,
+    space_component,
     git_repo_component,
     file_info_component,
     git_status_component,
@@ -351,7 +298,7 @@ local main_statusline = {
     macro_info_component,
     file_type_component,
     file_encoding_component,
-    -- scroll_component,
+    scroll_component,
 }
 
 require('heirline').setup {
