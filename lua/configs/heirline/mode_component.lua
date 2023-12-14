@@ -50,7 +50,7 @@ return {
         { icons.drawing.rounded_left_thick, icons.drawing.rounded_right_thick },
         function(self) return self.mode_colors[self.mode:sub(1, 1)] end,
         {
-            { provider = icons.logo_vim, hl = { fg = 'Background' } },
+            -- { provider = icons.logo_vim, hl = { fg = 'Background' } },
             {
                 provider = function(self)
                     return ' %-2(' .. self.mode_names[self.mode] .. '%)'

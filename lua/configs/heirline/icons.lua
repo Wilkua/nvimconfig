@@ -25,7 +25,7 @@ return {
     },
     logo_bsd = '',
     logo_vim = '',
-    logo_winox = '󰨡',
+    logo_win9x = '󰨡',
 
     column_number = '',
     line_number = '',
