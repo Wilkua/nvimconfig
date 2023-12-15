@@ -13,12 +13,8 @@ local git_repo_component = {
 
 local git_status_component = {
     condition = function()
-        if conditions.is_git_repo() then
-            local status_dict = vim.b.gitsigns_status_dict
-            local has_changes = status_dict.added ~= 0 or status_dict.removed ~= 0 or status_dict.changed ~= 0
-            return has_changes
-        end
-        return false
+        local status_dict = vim.b.gitsigns_status_dict
+        return status_dict.added ~= 0 or status_dict.removed ~= 0 or status_dict.changed ~= 0
     end,
     init = function(self)
         self.status_dict = vim.b.gitsigns_status_dict
@@ -26,21 +22,21 @@ local git_status_component = {
     {
         provider = function(self)
             local count = self.status_dict.added or 0
-            return count > 0 and (' ' .. count .. ' ')
+            return count > 0 and ('  ' .. count)
         end,
         hl = { fg = 'StatusGitAdded' },
     },
     {
         provider = function(self)
             local count = self.status_dict.changed or 0
-            return count > 0 and (' ' .. count .. ' ')
+            return count > 0 and ('  ' .. count)
         end,
         hl = { fg = 'StatusGitChanged' },
     },
     {
         provider = function(self)
             local count = self.status_dict.removed or 0
-            return count > 0 and (' ' .. count .. ' ')
+            return count > 0 and ('  ' .. count)
         end,
         hl = { fg = 'StatusGitRemoved' },
     },

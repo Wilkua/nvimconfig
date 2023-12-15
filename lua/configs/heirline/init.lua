@@ -196,6 +196,7 @@ local main_statusline = {
     mode_component,
     space_component,
     git_component,
+    space_component,
     file_info_component,
     diagnostics_component,
     filler_component,
