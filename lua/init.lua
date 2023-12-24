@@ -24,6 +24,7 @@ set.shiftwidth = 4                   -- Set the shift width to 4 spaces
 set.expandtab = true                 -- Turn tabs into spaces.
 set.number = true                    -- Always enable line numbers
 set.relativenumber = true            -- Enable relative line numbers
+set.numberwidth = 7                  -- Expand number column
 set.autoindent = true                -- Turn on auto indent
 set.copyindent = true                -- Copy indent structure from other lines
 set.cursorline = true                -- Highlight the line the cursor is on
