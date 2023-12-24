@@ -9,10 +9,11 @@ return {
         end,
     },
     { 'folke/tokyonight.nvim', version = '*', priority = 1000 },
-    { "catppuccin/nvim", name = "catppuccin", priority = 1000 },
+    { 'catppuccin/nvim', name = 'catppuccin', priority = 1000 },
+    { 'rose-pine/neovim', name = 'rose-pine', priority = 1000 },
 
-    "nvim-lua/plenary.nvim",
-    'stevearc/dressing.nvim',
+    'folke/lazy.nvim',
+
     {
         'windwp/nvim-autopairs',
         opts = { check_ts = true },
@@ -26,21 +27,89 @@ return {
             end
         end,
     },
-    { 'ggandor/leap.nvim', config = function() require('leap').add_default_mappings() end },
+
     {
         'folke/which-key.nvim',
         event = 'VeryLazy',
         opts = { disable = { filetypes = { "TelescopePrompt" } } },
     },
+
+    {
+        'folke/trouble.nvim',
+        dependencies = { 'nvim-tree/nvim-web-devicons' },
+        opts = {
+            height = 15,
+        },
+    },
+
+    {
+        'gbprod/yanky.nvim',
+        opts = {},
+        keys = {
+            { '<leader>p', function() require('telescope').extensions.yank_history.yank_history({ }) end, desc = 'Open Yank History' },
+            { 'y', '<Plug>(YankyYank)', mode = { 'n', 'x' }, desc = 'Yank text' },
+            { 'p', '<Plug>(YankyPutAfter)', mode = { 'n', 'x' }, desc = 'Put yanked text after cursor' },
+            { 'P', '<Plug>(YankyPutBefore)', mode = { 'n', 'x' }, desc = 'Put yanked text before cursor' },
+            { 'gp', '<Plug>(YankyGPutAfter)', mode = { 'n', 'x' }, desc = 'Put yanked text after selection' },
+            { 'gP', '<Plug>(YankyGPutBefore)', mode = { 'n', 'x' }, desc = 'Put yanked text before selection' },
+            { '<c-p>', '<Plug>(YankyPreviousEntry)', desc = 'Select previous entry through yank history' },
+            { '<c-n>', '<Plug>(YankyNextEntry)', desc = 'Select next entry through yank history' },
+            { ']p', '<Plug>(YankyPutIndentAfterLinewise)', desc = 'Put indented after cursor (linewise)' },
+            { '[p', '<Plug>(YankyPutIndentBeforeLinewise)', desc = 'Put indented before cursor (linewise)' },
+            { ']P', '<Plug>(YankyPutIndentAfterLinewise)', desc = 'Put indented after cursor (linewise)' },
+            { '[P', '<Plug>(YankyPutIndentBeforeLinewise)', desc = 'Put indented before cursor (linewise)' },
+            { '>p', '<Plug>(YankyPutIndentAfterShiftRight)', desc = 'Put and indent right' },
+            { '<p', '<Plug>(YankyPutIndentAfterShiftLeft)', desc = 'Put and indent left' },
+            { '>P', '<Plug>(YankyPutIndentBeforeShiftRight)', desc = 'Put before and indent right' },
+            { '<P', '<Plug>(YankyPutIndentBeforeShiftLeft)', desc = 'Put before and indent left' },
+            { '=p', '<Plug>(YankyPutAfterFilter)', desc = 'Put after applying a filter' },
+            { '=P', '<Plug>(YankyPutBeforeFilter)', desc = 'Put before applying a filter' },
+        },
+    },
+
+    {
+        'rebelot/heirline.nvim',
+        tag = 'stable',
+        event = { 'UiEnter' },
+        config = function() require 'configs.heirline' end,
+    },
+
+    {
+        'akinsho/toggleterm.nvim',
+        version = '*',
+        cmd = { 'ToggleTerm', 'TermExec' },
+        opts = {
+            size = 25,
+            shell = vim.o.shell == 'cmd.exe' and 'pwsh.exe' or vim.o.shell,
+        },
+    },
+
+    {
+        'nvim-neo-tree/neo-tree.nvim',
+        cmd = 'Neotree',
+        branch = 'v3.x',
+        dependencies = {
+            'nvim-lua/plenary.nvim',
+            'nvim-tree/nvim-web-devicons',
+            'MunifTanjim/nui.nvim',
+        },
+        init = function() vim.g.neo_tree_remove_legacy_commands = true end,
+    },
+
+    { 'rcarriga/nvim-notify', init = function() vim.notify = require 'notify' end },
     {'famiu/bufdelete.nvim', cmd = { 'Bdelete', 'Bwipeout' }},
-    { 'NvChad/nvim-colorizer.lua', config = true },
+    { 'williamboman/mason.nvim', config = true, },
+    { 'numToStr/Comment.nvim', config = true },
+    { 'lewis6991/gitsigns.nvim', config = true },
+    { 'stevearc/resession.nvim', config = true },
+    { 'ggandor/leap.nvim', config = function() require('leap').add_default_mappings() end },
+    -- { 'jose-elias-alvarez/null-ls.nvim', config = true },
 
     'editorconfig/editorconfig-vim',
     'tpope/vim-fugitive',
-    'tpope/vim-jdaddy',
     'tpope/vim-repeat',
     'tpope/vim-surround',
     'tpope/vim-unimpaired',
-    {'ludovicchabant/vim-gutentags', enabled = vim.fn.executable 'ctags' == 1 },
-    'wellle/targets.vim',
+    -- {'ludovicchabant/vim-gutentags', enabled = vim.fn.executable 'ctags' == 1 },
+    -- 'wellle/targets.vim',
 }
