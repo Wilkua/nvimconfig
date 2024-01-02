@@ -55,6 +55,8 @@ noremap({'n', 'v'}, '<c-y>', "v:count == 0 ? '5<c-y>' : '<c-y>'", { expr = true 
 -- Other movement improvements
 noremap({'n', 'v'}, 'j', "v:count == 0 ? 'gj' : 'j'", { expr = true })
 noremap({'n', 'v'}, 'k', "v:count == 0 ? 'gk' : 'k'", { expr = true })
+noremap('v', 'J', ":m '>+1<CR>gv=gv", { desc = 'Move selected lines down' })
+noremap('v', 'K', ":m '<-2<CR>gv=gv", { desc = 'Move selected lines up' })
 
 -- Faster saving
 noremap('n', '<leader>w', '<cmd>w<CR>', { desc = 'Save file' })
