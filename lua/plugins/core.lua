@@ -84,32 +84,16 @@ return {
         },
     },
 
-    {
-        'nvim-neo-tree/neo-tree.nvim',
-        cmd = 'Neotree',
-        branch = 'v3.x',
-        dependencies = {
-            'nvim-lua/plenary.nvim',
-            'nvim-tree/nvim-web-devicons',
-            'MunifTanjim/nui.nvim',
-        },
-        init = function() vim.g.neo_tree_remove_legacy_commands = true end,
-    },
-
     { 'rcarriga/nvim-notify', init = function() vim.notify = require 'notify' end },
     {'famiu/bufdelete.nvim', cmd = { 'Bdelete', 'Bwipeout' }},
-    { 'williamboman/mason.nvim', config = true, },
+    { 'williamboman/mason.nvim', config = true },
     { 'numToStr/Comment.nvim', config = true },
     { 'lewis6991/gitsigns.nvim', config = true },
     { 'stevearc/resession.nvim', config = true },
     { 'ggandor/leap.nvim', config = function() require('leap').add_default_mappings() end },
-    -- { 'jose-elias-alvarez/null-ls.nvim', config = true },
 
     'editorconfig/editorconfig-vim',
     'tpope/vim-fugitive',
     'tpope/vim-repeat',
     'tpope/vim-surround',
-    'tpope/vim-unimpaired',
-    -- {'ludovicchabant/vim-gutentags', enabled = vim.fn.executable 'ctags' == 1 },
-    -- 'wellle/targets.vim',
 }
