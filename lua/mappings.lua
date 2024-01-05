@@ -1,11 +1,6 @@
 -- Key Mappings
 
--- Map keys with "remap = true" by default
-local noremap = function (mode, lhs, rhs, opts)
-    local key_opts = opts or {}
-    if key_opts['noremap'] == nil then key_opts['noremap'] = true end
-    vim.keymap.set(mode, lhs, rhs, key_opts)
-end
+local noremap = require 'config_utils'.noremap
 
 -- Set arrow keys to move between windows
 noremap('n', '<up>', '<c-w>k')
@@ -42,21 +37,29 @@ vim.keymap.set('n', 'Q', 'gq', { desc = 'Format with motion' })
 -- so that you can undo CTRL-U after inserting a line break.
 noremap('i', '<c-u>', '<c-g>u<c-U>')
 
--- Center the line moved to with G
+-- Attempt to keep the cursor in the center at all times
 noremap('n', 'G', 'Gzz')
-
--- Center the found search item
 noremap('n', 'n', 'nzz')
+noremap('n', 'N', 'Nzz')
+noremap('n', '{', '{zz')
+noremap('n', '}', '}zz')
+noremap('n', 'H', 'Hzz')
+noremap('n', 'L', 'Lzz')
 
 -- Faster screen movement
-noremap({'n', 'v'}, '<c-e>', "v:count == 0 ? '5<c-e>' : '<c-e>'", { expr = true })
-noremap({'n', 'v'}, '<c-y>', "v:count == 0 ? '5<c-y>' : '<c-y>'", { expr = true })
+noremap({'n', 'v'}, '<c-e>', "v:count == 0 ? '5<c-e>5j' : '<c-e>'", { expr = true })
+noremap({'n', 'v'}, '<c-y>', "v:count == 0 ? '5<c-y>5k' : '<c-y>'", { expr = true })
 
 -- Other movement improvements
 noremap({'n', 'v'}, 'j', "v:count == 0 ? 'gj' : 'j'", { expr = true })
 noremap({'n', 'v'}, 'k', "v:count == 0 ? 'gk' : 'k'", { expr = true })
 noremap('v', 'J', ":m '>+1<CR>gv=gv", { desc = 'Move selected lines down' })
 noremap('v', 'K', ":m '<-2<CR>gv=gv", { desc = 'Move selected lines up' })
+
+noremap('n', '[B', ':bfirst<CR>', { desc = 'Go to first buffer' })
+noremap('n', '[b', ':bprevious<CR>', { desc = 'Go to previous buffer' })
+noremap('n', ']B', ':blast<CR>', { desc = 'Go to last buffer' })
+noremap('n', ']b', ':bnext<CR>', { desc = 'Go to next buffer' })
 
 -- Faster saving
 noremap('n', '<leader>w', '<cmd>w<CR>', { desc = 'Save file' })
