@@ -46,6 +46,24 @@ set.updatetime = 400                 -- Faster time before updating swap
 set.path:append('**')                -- Include working direcotry in search path
 set.signcolumn = 'yes'               -- Always show sign column
 
+-- Attempt to smartly keep the cursor vertically in the middle
+-- of the screen
+vim.api.nvim_create_autocmd({ 'WinResized', 'BufEnter', 'BufWinEnter' }, {
+    pattern = '*',
+    callback = function()
+        local evt = vim.v.event
+        if (evt.windows ~= nil) then
+            for _, v in ipairs(evt.windows) do
+                local scroll_height = math.floor(vim.api.nvim_win_get_height(v) / 2)
+                vim.api.nvim_win_set_option(v, 'scrolloff', scroll_height)
+            end
+        else
+            local scroll_height = math.floor(vim.api.nvim_win_get_height(0) / 2)
+            vim.api.nvim_win_set_option(0, 'scrolloff', scroll_height)
+        end
+    end,
+})
+
 if vim.fn.has('nvim') == 1 then
     -- For Neovim 0.1.3 and 0.1.4 < https://github.com/neovim/neovim/pull/2198 >
     vim.env.NVIM_TUI_ENABLE_TRUE_COLOR = 1
@@ -75,10 +93,10 @@ end
 ----------------------
 
 -- JSON Syntax
-vim.g.vim_json_syntax_conceal = 0  -- Don't hide quotes in JSON files
+vim.g.vim_json_syntax_conceal = 0 -- Don't hide quotes in JSON files
 
 -- EditorConfig
-vim.g.EditorConfig_exclude_patterns = {'fugitive://.*', 'scp://.*'}
+vim.g.EditorConfig_exclude_patterns = { 'fugitive://.*', 'scp://.*' }
 
 -- Load plugins and configs --
 require 'loader'
