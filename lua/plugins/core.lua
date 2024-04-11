@@ -29,12 +29,6 @@ return {
     },
 
     {
-        'folke/which-key.nvim',
-        event = 'VeryLazy',
-        opts = { disable = { filetypes = { "TelescopePrompt" } } },
-    },
-
-    {
         'folke/trouble.nvim',
         dependencies = { 'nvim-tree/nvim-web-devicons' },
         opts = {
@@ -90,7 +84,7 @@ return {
     { 'numToStr/Comment.nvim', config = true },
     { 'lewis6991/gitsigns.nvim', config = true },
     { 'stevearc/resession.nvim', config = true },
-    { 'ggandor/leap.nvim', config = function() require('leap').add_default_mappings() end },
+    { "lukas-reineke/indent-blankline.nvim", main = "ibl", opts = {} },
 
     'editorconfig/editorconfig-vim',
     'tpope/vim-fugitive',
