@@ -48,7 +48,9 @@ set.signcolumn = 'yes'               -- Always show sign column
 
 -- Attempt to smartly keep the cursor vertically in the middle
 -- of the screen
+local gid = vim.api.nvim_create_augroup('CenterStage', { clear = true })
 vim.api.nvim_create_autocmd({ 'WinResized', 'BufEnter', 'BufWinEnter' }, {
+    group = gid,
     pattern = '*',
     callback = function()
         local evt = vim.v.event
@@ -76,7 +78,7 @@ if vim.fn.has('termguicolors') == 1 then
     set.termguicolors = true
 end
 
-set.guifont = 'FiraCode_Nerd_Font:h12'
+set.guifont = 'FiraCode_Nerd_Font:h11'
 
 -- ----------------
 -- Neovide setup --

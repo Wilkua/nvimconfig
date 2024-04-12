@@ -60,8 +60,8 @@ vim.keymap.set('n', ']C', ':clast<CR>', { desc = 'Go to last quickfix item' })
 vim.keymap.set('n', ']c', ':cnext<CR>', { desc = 'Go to next quickfix item' })
 
 -- Faster saving
-vim.keymap.set('n', '<leader>w', '<cmd>w<CR>', { desc = 'Save file', silent = true })
-vim.keymap.set('n', '<leader>W', '<cmd>w!<CR>', { desc = 'Force save file' })
+vim.keymap.set('n', '<leader>w', '<cmd>silent w<CR>', { desc = 'Save file' })
+vim.keymap.set('n', '<leader>W', '<cmd>silent w!<CR>', { desc = 'Force save file' })
 
 -- Aerial mappings
 vim.keymap.set('n', '<leader>o', function() require('aerial').toggle() end, { desc = 'Toggle symbol outline' })
