@@ -66,6 +66,9 @@ vim.keymap.set('n', '<leader>W', '<cmd>silent w!<CR>', { desc = 'Force save file
 -- Aerial mappings
 vim.keymap.set('n', '<leader>o', function() require('aerial').toggle() end, { desc = 'Toggle symbol outline' })
 
+-- Cloak
+vim.keymap.set('n', '<leader>cp', '<cmd>silent! CloakPreviewLine<CR>', { desc = 'Preview cloaked line' })
+
 -- Gitsigns mappings
 vim.keymap.set('n', ']g', function() require('gitsigns').next_hunk() end, { desc = 'Next Git hunk' })
 vim.keymap.set('n', '[g', function() require('gitsigns').prev_hunk() end, { desc = 'Previous Git hunk' })

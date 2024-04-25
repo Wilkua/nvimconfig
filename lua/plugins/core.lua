@@ -78,6 +78,25 @@ return {
         },
     },
 
+    {
+        'laytan/cloak.nvim',
+        opts = {
+            enabled = true,
+            cloak_character = '*',
+            highlight_gropu = 'Comment',
+            cloak_length = 6,
+            try_all_patterns = true,
+            cloak_telescope = true,
+            patterns = {
+                {
+                    file_pattern = '.env*',
+                    cloak_pattern = '(.+)=.+',
+                    replace = '%1=',
+                },
+            },
+        },
+    },
+
     { 'rcarriga/nvim-notify', init = function() vim.notify = require 'notify' end },
     {'famiu/bufdelete.nvim', cmd = { 'Bdelete', 'Bwipeout' }},
     { 'williamboman/mason.nvim', config = true },
