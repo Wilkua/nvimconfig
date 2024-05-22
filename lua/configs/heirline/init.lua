@@ -10,9 +10,15 @@ local git_component = require 'configs.heirline.git_component'
 local mode_component = require 'configs.heirline.mode_component'
 local ruler_component = require 'configs.heirline.ruler_component'
 
+local buf_type_component = {
+    provider = function()
+        return string.upper(vim.bo.buftype)
+    end,
+}
+
 local file_type_component = {
     provider = function()
-        return string.upper(vim.bo.filetype) .. ' '
+        return string.upper(vim.bo.filetype)
     end,
 }
 
@@ -67,6 +73,8 @@ local helpfile_name_component = {
 
 local filler_component = { provider = '%=' }
 
+local space_component = { provider = ' ' }
+
 local help_statusline = {
     condition = function()
         return conditions.buffer_matches({
@@ -76,11 +84,23 @@ local help_statusline = {
     end,
 
     file_type_component,
+    space_component,
    helpfile_name_component,
    filler_component,
 }
 
-local space_component = { provider = ' ' }
+local terminal_statusline = {
+    condition = function()
+        return conditions.buffer_matches({
+            buftype = { 'terminal' },
+        })
+    end,
+
+    buf_type_component,
+    space_component,
+    utils.surround({ '[', ']' }, nil, file_type_component)
+}
+
 local main_statusline = {
     hl = function()
         if conditions.is_active() then
@@ -88,6 +108,12 @@ local main_statusline = {
         end
         return 'StatusLineNC'
     end,
+    update = {
+        'CmdlineLeave',
+        'CmdwinLeave',
+        'ColorScheme',
+        'CursorHold'
+    },
 
     { provider = icons.drawing.bar_half, hl = { fg = 'StatusBlue' } },
     space_component,
@@ -95,8 +121,8 @@ local main_statusline = {
     space_component,
     git_component,
     space_component,
-    file_info_component,
     diagnostics_component,
+    file_info_component,
     filler_component,
     macro_info_component,
     file_type_component,
@@ -113,6 +139,7 @@ require('heirline').setup {
         fallthrough = false,
 
         help_statusline,
+        terminal_statusline,
         main_statusline,
     },
 }

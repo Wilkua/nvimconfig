@@ -45,29 +45,18 @@ return {
             t =  'StatusModeT',
         }
     },
-
-    utils.surround(
-        { icons.drawing.rounded_left_thick, icons.drawing.rounded_right_thick },
-        function(self) return self.mode_colors[self.mode:sub(1, 1)] end,
-        {
-            -- { provider = icons.logo_vim, hl = { fg = 'Background' } },
-            {
-                provider = function(self)
-                    return ' %-2(' .. self.mode_names[self.mode] .. '%)'
-                end,
-                hl = function(self)
-                    local mode = self.mode:sub(1, 1)
-                    self.bg_color = self.mode_colors[mode]
-                    return { bg = self.bg_color, fg = 'Background', bold = true, }
-                end,
-                update = {
-                    'ModeChanged',
-                    pattern = '*:*',
-                    callback = vim.schedule_wrap(function()
-                        vim.cmd 'redrawstatus'
-                    end),
-                },
-            },
-        }
-    )
+    update = {
+        'ModeChanged',
+        pattern = '*:*',
+        callback = vim.schedule_wrap(function()
+            vim.cmd 'redrawstatus'
+        end),
+    },
+    provider = function(self)
+        return self.mode_names[self.mode]
+    end,
+    hl = function(self)
+        self.color = self.mode_colors[self.mode:sub(1, 1)]
+        return { fg = self.color, bg = 'Background', bold = true }
+    end
 }

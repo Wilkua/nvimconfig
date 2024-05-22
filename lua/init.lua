@@ -57,11 +57,11 @@ vim.api.nvim_create_autocmd({ 'WinResized', 'BufEnter', 'BufWinEnter' }, {
         if (evt.windows ~= nil) then
             for _, v in ipairs(evt.windows) do
                 local scroll_height = math.floor(vim.api.nvim_win_get_height(v) / 2)
-                vim.api.nvim_win_set_option(v, 'scrolloff', scroll_height)
+                vim.api.nvim_set_option_value('scrolloff', scroll_height, { scope = 'local', win = v })
             end
         else
             local scroll_height = math.floor(vim.api.nvim_win_get_height(0) / 2)
-            vim.api.nvim_win_set_option(0, 'scrolloff', scroll_height)
+            vim.api.nvim_set_option_value('scrolloff', scroll_height, { scope = 'local', win = 0})
         end
     end,
 })
@@ -78,7 +78,7 @@ if vim.fn.has('termguicolors') == 1 then
     set.termguicolors = true
 end
 
-set.guifont = 'FiraCode_Nerd_Font:h11'
+set.guifont = 'FiraCode_Nerd_Font:h13'
 
 -- ----------------
 -- Neovide setup --

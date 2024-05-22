@@ -7,6 +7,7 @@ local file_info_component = {
     init = function(self)
         self.filename = vim.api.nvim_buf_get_name(0)
     end,
+    update = { 'BufFilePost', 'BufReadPost', 'BufWritePost' },
 }
 
 local file_icon_component = {

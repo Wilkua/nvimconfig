@@ -1,7 +1,7 @@
 local icons = require 'configs.heirline.icons'
 local conditions = require 'heirline.conditions'
 
-local git_repo_component = {
+local git_branch_component = {
     init = function(self)
         self.status_dict = vim.b.gitsigns_status_dict
     end,
@@ -11,40 +11,15 @@ local git_repo_component = {
     hl = { fg = 'orange' },
 }
 
-local git_status_component = {
-    condition = function()
-        local status_dict = vim.b.gitsigns_status_dict
-        return status_dict.added ~= 0 or status_dict.removed ~= 0 or status_dict.changed ~= 0
-    end,
-    init = function(self)
-        self.status_dict = vim.b.gitsigns_status_dict
-    end,
-    {
-        provider = function(self)
-            local count = self.status_dict.added or 0
-            return count > 0 and ('  ' .. count)
-        end,
-        hl = { fg = 'StatusGitAdded' },
-    },
-    {
-        provider = function(self)
-            local count = self.status_dict.changed or 0
-            return count > 0 and ('  ' .. count)
-        end,
-        hl = { fg = 'StatusGitChanged' },
-    },
-    {
-        provider = function(self)
-            local count = self.status_dict.removed or 0
-            return count > 0 and ('  ' .. count)
-        end,
-        hl = { fg = 'StatusGitRemoved' },
-    },
-}
-
 return {
     condition = conditions.is_git_repo,
+    update = {
+        'BufEnter',
+        'BufFilePost',
+        'BufLeave',
+        'BufReadPost',
+        'BufWritePost',
+    },
 
-    git_repo_component,
-    git_status_component,
+    git_branch_component,
 }
