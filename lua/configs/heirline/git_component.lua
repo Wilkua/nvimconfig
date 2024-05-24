@@ -19,6 +19,10 @@ return {
         'BufLeave',
         'BufReadPost',
         'BufWritePost',
+
+        callback = vim.schedule_wrap(function()
+            vim.cmd 'redrawstatus'
+        end),
     },
 
     git_branch_component,

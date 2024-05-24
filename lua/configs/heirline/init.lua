@@ -87,6 +87,7 @@ local help_statusline = {
     space_component,
    helpfile_name_component,
    filler_component,
+    ruler_component
 }
 
 local terminal_statusline = {
@@ -95,10 +96,12 @@ local terminal_statusline = {
             buftype = { 'terminal' },
         })
     end,
+    hl = { fg = 'Comment' },
 
     buf_type_component,
     space_component,
-    utils.surround({ '[', ']' }, nil, file_type_component)
+    utils.surround({ '[', ']' }, nil, file_type_component),
+    filler_component,
 }
 
 local main_statusline = {
@@ -109,10 +112,17 @@ local main_statusline = {
         return 'StatusLineNC'
     end,
     update = {
+        'BufEnter',
         'CmdlineLeave',
         'CmdwinLeave',
         'ColorScheme',
-        'CursorHold'
+        'CursorHold',
+
+        callback = function()
+            vim.schedule_wrap(function()
+                vim.cmd 'redrawstatus'
+            end)
+        end,
     },
 
     { provider = icons.drawing.bar_half, hl = { fg = 'StatusBlue' } },
@@ -122,10 +132,12 @@ local main_statusline = {
     git_component,
     space_component,
     diagnostics_component,
+    space_component,
     file_info_component,
     filler_component,
     macro_info_component,
     file_type_component,
+    space_component,
     file_encoding_component,
     space_component,
     ruler_component,
